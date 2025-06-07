@@ -104,21 +104,71 @@ We can use this post as a resource:
 https://web.archive.org/web/20220118182443/https://www.whitehatsec.com/blog/magic-hashes/
 ```
 
+There is a magic number that when hashed will start with 0e.  
+We can verify that:  
 
+![obraz](https://github.com/user-attachments/assets/2aec1ea4-d035-4c1d-9d08-3749b70de908)
 
+Now if we use this as a password it will evaluate to 0, leading to authentication bypass.  
 
+## File Upload to shell access
 
+Let's login with  admin:240610708  
+We have ability to upload an image from the URL that we can specify.  
+First test a normal .png file:  
 
+![obraz](https://github.com/user-attachments/assets/53f84436-5d4e-493a-a3a2-c26bb1ede0b9)
 
+Output:  
 
+![obraz](https://github.com/user-attachments/assets/3a2a4424-aa28-4b49-94b4-154aa56b7e36)
 
- 
+It discloses two important information:  
+1. File upload location  
+2. We're using wget to upload a file  
 
+Let's check if we can reach this file:  
 
+![obraz](https://github.com/user-attachments/assets/d1181cc4-d925-4a7f-8463-9517b597cb71)
 
+We can reach this file, meaning now we have to bypass filter to upload php file containing a reverse shell.  
+First thing I tried was uploading test.php%00.png, but it gave an error.  
+We can try other methods to bypass filters but they didn't work.  
+The admin's profile description hints at "Limits," specifically referring to wget's filename character length limit.  
 
+![obraz](https://github.com/user-attachments/assets/56180dd7-ff4d-4c59-8459-fcca84f6516b)
 
+Linux character limit for a filename is 255, but wget will shorten filename to 236 characters which can be abused to bypass extension filter.  
+Let's first check it by uploading a file with 255 character long filename:  
 
+![obraz](https://github.com/user-attachments/assets/7313eb8e-508d-450d-ad22-c6d18c5f4c95)
+
+251 characters of A's and 4 characters for .png, resulting in 255 characters total.  
+Now upload it with python server to the site.  
+
+![obraz](https://github.com/user-attachments/assets/90a47040-5829-4e11-9255-576763dd553f)
+
+We can copy the truncated filename and use the wc -c command to count its length in characters.  
+
+![obraz](https://github.com/user-attachments/assets/ed555fa9-cb7e-4bff-9679-ff3b4a7ed7bc)
+
+How to exploit it?  
+Wget truncates filenames longer than 236 characters. By naming a file with 232 "A" characters + .php.png (240 chars total), the last 4 .png get cut off, leaving .php and bypassing upload filters.  
+
+![obraz](https://github.com/user-attachments/assets/8f9651b1-98cd-4366-83ba-31e5f3f2fcbc)
+
+Contents of this file in our case will be pentest monkey reverse shell.  
+```
+https://github.com/pentestmonkey/php-reverse-shell
+```
+
+After we upload our reverse shell we will be able to curl it (notice that we specify previously discovered file location):  
+
+![obraz](https://github.com/user-attachments/assets/f7d77d18-cd48-46f4-ba1c-7e5d242d559c)
+
+Resulting in a shell access:  
+
+![obraz](https://github.com/user-attachments/assets/e5fbaf72-7c1a-49aa-a0b6-eff3eeede516)
 
 
 
