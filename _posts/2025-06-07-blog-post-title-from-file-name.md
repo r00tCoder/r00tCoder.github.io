@@ -61,7 +61,36 @@ Unfortunately it didn't work.
 ![obraz](https://github.com/user-attachments/assets/8033077d-5e31-4b1b-adc1-e74aa0214265)  
 
 Observing the login page’s behavior, we notice it responds with “Try again” when the username doesn’t exist, but returns “Wrong identification: admin” when the username is valid.  
-Meaning we can try blind sql injection.
+Meaning we can try blind sql injection. In order to do that we can use --string parameter.  
+
+```
+sqlmap -r chris.req --string "Wrong identification"
+```
+![obraz](https://github.com/user-attachments/assets/22c3c9a7-f6e3-4ebe-bab3-0b0321ffcdb5)  
+
+Now all we need to do is add --dump parameter and wait.  
+```
+sqlmap -r chris.req --string "Wrong identification" --dump
+```
+
+![obraz](https://github.com/user-attachments/assets/81c8baa8-be1d-4a5b-ab4d-aadf22605c14)
+
+Copy those two passwords into a file and save.  
+Then proceed with hashcat module 0 - which is md5.  
+
+![obraz](https://github.com/user-attachments/assets/7a38a03a-7544-4f5a-b6a5-0d3cd42be273)
+
+After waiting for some time we get a result.  
+
+![obraz](https://github.com/user-attachments/assets/30bd5359-95a4-45ac-8eef-ef545e958354)
+
+## Elevate from chris to admin 
+
+
+
+
+
+
 
 
 
