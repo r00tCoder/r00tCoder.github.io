@@ -171,6 +171,143 @@ Resulting in a shell access:
 ![obraz](https://github.com/user-attachments/assets/e5fbaf72-7c1a-49aa-a0b6-eff3eeede516)
 
 
+## Privesc to Moshe
+
+We have shell access as www-data, meaning the first thing I will do is enumerating web root directory.  
+
+![obraz](https://github.com/user-attachments/assets/a06b88b9-8287-46ad-a071-0473e2b1a573)
+
+Connection.php exposed credentials.  
+```
+moshe:falafelIsReallyTasty
+```
+Now we can switch user.  
+
+![obraz](https://github.com/user-attachments/assets/6ddd9002-8529-4f15-b1df-5b531e5be554)
+
+We can retrieve a flag:  
+
+![obraz](https://github.com/user-attachments/assets/12133558-a586-47ce-815b-0a79466eef11)
+
+
+## Privesc to Yossi
+
+Moshe is a part of video group:  
+
+![obraz](https://github.com/user-attachments/assets/6fa0ed82-f5b0-4d7b-bacc-d19d9f8a51d3)
+
+I used this article as reference:  
+```
+https://steflan-security.com/linux-privilege-escalation-exploiting-user-groups/#video
+```
+
+We will copy /dev/fb0 to /tmp, fb0 is framebuffer device.  
+
+![obraz](https://github.com/user-attachments/assets/6e3ac0fe-db92-4476-ba94-29bdc2c0a003)
+
+In order to view this file we're also going to need the screen resolution:  
+
+![obraz](https://github.com/user-attachments/assets/85eea2f8-2011-4a42-9264-facc9ce74f0d)
+
+Screen resolution is:  
+1176x885  
+
+We have ssh access meaning we can transfer this file with scp utility.  
+
+![obraz](https://github.com/user-attachments/assets/5c5b1207-8045-41b5-804e-26c65cf0711f)
+
+I'll use perl script from previous article.  
+```
+#!/usr/bin/perl -w
+
+$w = shift || 240;
+$h = shift || 320;
+$pixels = $w * $h;
+
+open OUT, "|pnmtopng" or die "Can't pipe pnmtopng: $!\n";
+
+printf OUT "P6%d %d\n255\n", $w, $h;
+
+while ((read STDIN, $raw, 2) and $pixels--) {
+   $short = unpack('S', $raw);
+   print OUT pack("C3",
+      ($short & 0xf800) >> 8,
+      ($short & 0x7e0) >> 3,
+      ($short & 0x1f) << 3);
+}
+
+close OUT;
+```
+
+This script will convert .raw file to .png:  
+![obraz](https://github.com/user-attachments/assets/2d133193-40b3-4056-9db3-1de152c17273)  
+
+Now we can view it:  
+![obraz](https://github.com/user-attachments/assets/259766a8-0dd3-4b30-bfb1-77196e55bb1d)  
+
+It discloses a password:  
+yossi:MoshePlzStopHackingMe!  
+
+
+## Privesc to root
+
+We'll login via ssh as yossi:  
+
+![obraz](https://github.com/user-attachments/assets/b7e549e3-b163-4a6e-94c8-3709b65103af)
+
+We're in disk group which can be abused.  
+First we'll check mounted filesystems:  
+![obraz](https://github.com/user-attachments/assets/fa98dffa-0e9c-4009-a672-a20042355edc)
+
+Ideally we want a filesystem with / directory mounted.  
+
+We'll now use debugfs to enter this filesystem:  
+
+![obraz](https://github.com/user-attachments/assets/0650a2c5-36c4-4159-8b86-577dbdb1fec3)  
+
+We can also get root's ssh key:  
+![obraz](https://github.com/user-attachments/assets/6d418e1f-9d45-4a93-b3a1-640f2ccd8803)
+
+Lastly save it to a file on kali and login:  
+
+![obraz](https://github.com/user-attachments/assets/7505ed8b-331d-40a8-864e-f6c1b8f297f3)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
