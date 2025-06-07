@@ -84,7 +84,25 @@ After waiting for some time we get a result.
 
 ![obraz](https://github.com/user-attachments/assets/30bd5359-95a4-45ac-8eef-ef545e958354)
 
-## Elevate from chris to admin 
+## Elevate from chris to admin
+
+We can log in using the credentials chris:juggling.  
+Chris’s profile description heavily hints at a PHP type juggling vulnerability.  
+The admin’s password hash starts with 0e, which PHP interprets as scientific notation for zero when using loose comparison (==).  
+
+In the code, authentication likely uses a loose comparison like:  
+```
+if ($password_hash == $stored_hash) { ... }
+```
+Because the hash starts with 0e, PHP treats it as 0. If we supply a password that when hashed also evaluates to 0 under loose comparison the comparison becomes:  
+```
+0 == 0
+``` 
+which evaluates to true, allowing us to bypass authentication and gain admin access.   
+We can use this post as a resource:  
+```
+https://web.archive.org/web/20220118182443/https://www.whitehatsec.com/blog/magic-hashes/
+```
 
 
 
