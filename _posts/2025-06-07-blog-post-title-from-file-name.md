@@ -27,6 +27,73 @@ There is a login page:
 
 
 I tried some basic sql injection and default credentials but it didn't work.  
+Now we can look for exposed directories using Feroxbuster.  
+I'll use a list from Seclists first:  
+
+![obraz](https://github.com/user-attachments/assets/a5fcc7c1-d122-4e7f-85cf-d1f91871968f)  
+
+We've successfully found two files:  
+**cyberlaw.txt** and **Connection.php**  
+Let's take a look at cyberlaw.txt:  
+
+![obraz](https://github.com/user-attachments/assets/dd6749c1-254c-4514-8c70-a630d0578019)
+
+It contains new user "chris" and a hint that we will be able to login without a password.  
+
+## Login Page  
+
+Now we will move to the login page and try to bypass authentication somehow.  
+My first idea was to run sqlmap against it.  
+For it to work we will open Burpsuite turn intercept on and catch login request.  
+
+![obraz](https://github.com/user-attachments/assets/21bd2ea4-5493-49cb-8e1b-d1fde5c86063)  
+
+Copy the request to a file and save it.  
+
+![obraz](https://github.com/user-attachments/assets/8644f8a1-6a60-4cea-841d-bd449a9910b8)
+
+Now we can run sqlmap.  
+```
+sqlmap -r chris.req
+```
+
+Unfortunately it didn't work.  
+![obraz](https://github.com/user-attachments/assets/8033077d-5e31-4b1b-adc1-e74aa0214265)  
+
+Observing the login page’s behavior, we notice it responds with “Try again” when the username doesn’t exist, but returns “Wrong identification: admin” when the username is valid.  
+Meaning we can try blind sql injection.
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
