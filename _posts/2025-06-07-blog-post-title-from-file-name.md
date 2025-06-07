@@ -15,7 +15,7 @@ Privilege escalation involved extracting framebuffer data via video group access
 
 ![obraz](https://github.com/user-attachments/assets/6a220eb0-32fb-4c58-8d9f-8083c92db1a3)  
 
-## <span style="color: red;">Port 80 - Website</span>
+## Port 80 - Website 
 
 ![obraz](https://github.com/user-attachments/assets/cc28b3db-36e5-430d-b2e6-36692437d945)  
 
