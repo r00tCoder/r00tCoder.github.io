@@ -1,5 +1,5 @@
 
-## HTB Falafel - Writeup
+## HTB Falafel (Hard) - Writeup
 
 Difficulty: Hard
 
