@@ -1,4 +1,4 @@
-## HTB Object - Writeup
+## HTB Object (Hard) - Writeup
 
 Difficulty: Hard
 
