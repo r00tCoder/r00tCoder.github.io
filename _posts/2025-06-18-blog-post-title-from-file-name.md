@@ -71,6 +71,45 @@ We will perform Fuzzing on the Cookie name:
 
 After running it for the first time we noticed that everything returns 30 W, meaning we need to us --hw 30 to filter it out as shown above.  
 
+We've successfully found a cookie name, we can try bruteforcing it with the same tool.  
+We will use a list from seclists containing parameter names.  
+
+![obraz](https://github.com/user-attachments/assets/628e7d54-2d2e-4606-98a9-a93b2f99c1fd)  
+
+Now we have both cookie name and it's value.  
+We will now open developer tools with F12 and add a cookie called "password" with a value "secret".  
+
+![obraz](https://github.com/user-attachments/assets/b744e9a6-bdf9-4bd5-8343-ec23d909aad8)
+
+Now when we refresh the page we get more access.  
+
+![obraz](https://github.com/user-attachments/assets/c9c77166-364d-44e1-a79e-fbb5ee772f81)  
+
+It's a TCP socket test site.  
+We can specify a port and a line to send.   
+I'll try some basic command injection.  
+
+![obraz](https://github.com/user-attachments/assets/d42ba6b0-7c6d-4c90-957d-8c5b036dd835)
+
+Unfortunately it has a filter for that.  
+
+![obraz](https://github.com/user-attachments/assets/014dd68e-0091-405c-997f-d8456837c02e)  
+
+After looking at how this web app behaves we notice that it gives "500 internal server error" for non-listening ports.  
+I'll use wfuzz again to check for other open ports that may be working locally that we weren't able to talk to before.  
+First let's create a list for all port numbers.  
+
+![obraz](https://github.com/user-attachments/assets/17dc7aeb-ad95-480d-a617-d37a67f6652c)  
+
+And now use it with wfuzz and filter out http code 500:  
+
+![obraz](https://github.com/user-attachments/assets/fa89e066-67ef-4ba0-a10e-33a7afb26ec8)
+
+We have found port 11211, it's used for memcached - "a high-performance, distributed memory object caching system."   
+It's designed to speed up web apps by caching frequently accessed data.  
+
+
+
 
 
 
