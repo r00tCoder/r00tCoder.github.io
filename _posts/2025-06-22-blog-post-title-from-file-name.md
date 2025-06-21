@@ -314,11 +314,37 @@ curl -X POST http://10.10.10.235:31337/upload -H 'content-type: application/json
 ![obraz](https://github.com/user-attachments/assets/06ecac76-7e33-40f6-b403-23fa5027b8cc)
 
 
+Let's upgrade this shell:  
+
+![obraz](https://github.com/user-attachments/assets/9fb9fbc8-b967-420e-9ebd-eab6d093eefa)
+
+We're immediately a root, meaning it would be some sort of container most likely.  
+After some enumeration I found /etc/hosts that exposed that it is a kubernetes container:  
+
+![obraz](https://github.com/user-attachments/assets/126421dc-9b25-4e63-9147-dbe9cb832142)
+
+It still had a first flag tho.  
+
+![obraz](https://github.com/user-attachments/assets/719b8c6f-eb8f-44ef-97e0-db7673bb595e)
 
 
 
+## Kubernetes - Priv Esc
 
+In order to interact with kubernetes we need to move kubectl binary to the target machine.  
+We can download it from this link:  
+```
+https://dl.k8s.io/release/v1.21.0/bin/linux/amd64/kubectl
+```
+And move it from kali to the target.  
 
+![obraz](https://github.com/user-attachments/assets/4378a2a8-6b8d-4a20-b2e6-807bded7d803)
+
+Let's use this tool to enumerate cluster.  
+First I will look at available namespaces.  
+A namespace contains Kubernetes resources like pods, services, and deployments.  
+
+![obraz](https://github.com/user-attachments/assets/a85a41e4-fab6-4f38-bf29-7f142f89b784)
 
 
 
