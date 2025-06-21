@@ -224,10 +224,26 @@ def resizeimg(image):
 
 
 
+## Exploitation based on source code  
 
+Let's open burpsuite, turn intercept on, run foxyproxy and catch a request to /download.  
 
+![obraz](https://github.com/user-attachments/assets/723a7b6d-ad64-43c7-af0a-01d84e965a0e)  
 
+We will send it to repeater in burp with ctrl+r, and change request method.   
 
+![obraz](https://github.com/user-attachments/assets/564ed7d1-4bc5-48a0-a6f8-fb12b3cd73c7)
+
+There is a part in code that reveals the parameter that we will add called "image":  
+
+![obraz](https://github.com/user-attachments/assets/a7923fd5-348a-4af7-a9c6-1579d394f3ee)
+
+Also if our filename contains .. or starts with ../ it will detect hacking and redirect us to /list.  
+Meaning typical Local File Inclusion won't work here.  
+But if we look at the code once again we notice os.path.join function is used.  
+If we use absolute path with this function it will ignore previous arguments, here resulting in LFI:  
+
+![obraz](https://github.com/user-attachments/assets/d280c173-5bbf-4bfa-8097-c0a973732a63)
 
 
 
