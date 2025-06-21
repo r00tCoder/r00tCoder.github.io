@@ -153,7 +153,7 @@ docker run --> Starts a new Docker container.
 -v /:/mountedroot --> Mounts the host's root filesystem / into the container at the path /mountedroot  
 -i --> Runs the container in interactive mode.   
 -t --> Allocates a pseudo-TTY  
-rhodes --> The name of the Docker image used to create the container.  
+rodhes --> The name of the Docker image used to create the container.  
 bash --> The command to run inside the container.  
 
 ## Retrieving a flag
