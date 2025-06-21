@@ -245,26 +245,78 @@ If we use absolute path with this function it will ignore previous arguments, he
 
 ![obraz](https://github.com/user-attachments/assets/d280c173-5bbf-4bfa-8097-c0a973732a63)
 
+From the output of /etc/passwd we found user 'john' and user 'dev'.   
+We can try something basic like looking for ssh keys:  
+```
+image=/home/john/.ssh/id_rsa
+and
+image=/home/dev/.ssh/id_rsa
+```
+
+unfortunetly we don't succeed.   
 
 
 
+## Enumerating config files using LFI  
+
+We know that target system runs nginx from previous nmap.  
+We'll start with:  
+```
+image=/etc/nginx.conf
+```
+But we don't have anything intresting there.  
+Second file I tried was:  
+```
+image=/etc/nginx/sites-enabled/default.conf
+```
+It also didn't work but sometimes it doesn't end with .conf:  
+```
+image=/etc/nginx/sites-enabled/default
+```
+
+Finally it worked, here's the output:  
+
+![obraz](https://github.com/user-attachments/assets/e4bc2c3e-f58e-401d-ac70-e1d9d2418668)
+
+It exposed web root directory name --> **/var/www/only4you.htb**  
+
+We can assume that main site is also written in flask meaning it is likely called app.py:  
+
+![obraz](https://github.com/user-attachments/assets/eb05d7d8-4937-4564-a395-2d42b859cac0)
 
 
 
+## Source Code - Analysis 2
 
+I'll copy only a snippet of the code here:   
+```
+from flask import Flask, render_template, request, flash, redirect
+from form import sendmessage
+import uuid
 
+app = Flask(__name__)
+app.secret_key = uuid.uuid4().hex
 
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    if request.method == 'POST':
+        email = request.form['email']
+        subject = request.form['subject']
+        message = request.form['message']
+        ip = request.remote_addr
 
+        status = sendmessage(email, subject, message, ip)
+        if status == 0:
+            flash('Something went wrong!', 'danger')
+        elif status == 1:
+            flash('You are not authorized!', 'danger')
+```
 
-
-
-
-
-
-
-
-
-
+It imports sendmessage from form library.  
+And also it passes user data to sendmessage function as seen below:  
+```
+status = sendmessage(email, subject, message, ip)
+```
 
 
 
