@@ -52,3 +52,13 @@ body {
 h2 {
   color: red !important;
 }
+
+.sticky-header {
+  position: sticky;
+  top: 0;
+  background-color: #111; /* Match your theme */
+  z-index: 1000;
+  padding: 1rem 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  transition: all 0.3s ease;
+}
