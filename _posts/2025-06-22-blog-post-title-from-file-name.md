@@ -6,6 +6,7 @@ Unobtainium was a creative and well-designed HTB box with a fun mix of web explo
 Electron app reverse-engineered,  
 Prototype pollution exploited for RCE,  
 Kubernetes pod lateral movement for privesc.  
+Good preparation for OSWE.  
 
 ---
 
