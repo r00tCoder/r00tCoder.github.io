@@ -62,6 +62,13 @@ We were lucky, it turned out that our target had netcat with -e option installed
 
 ![obraz](https://github.com/user-attachments/assets/fc520114-fb0f-42b9-b3c2-25cc7ec499d0)
 
+After a quick enumeration we see that it is likely a container, hostname is weird, and ip differs from the original one.  
+Also python is not installed meaning we can't upgrade a terminal.  
+
+
+
+
+
 
 
 
