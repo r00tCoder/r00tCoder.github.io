@@ -1,21 +1,39 @@
-/* General styling */
+---
+---
+
+@import "minima";
+
+/* ===== Custom Dark Theme ===== */
+
 body {
   background-color: #1f1f1f !important;
   color: #f5f5f5 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #ffffff !important;
 }
 
 h2 {
   color: red !important;
 }
 
+a {
+  color: #58a6ff !important;
+}
+
 hr {
   margin-top: 30px;
   margin-bottom: 20px;
+  border-color: #444;
 }
 
-/* Post navigation */
+/* ===== Post Navigation Styling ===== */
+
 .post_navi {
   display: flex;
+  margin-top: 2em;
 }
 
 .post_navi-label {
@@ -54,94 +72,63 @@ hr {
   opacity: 0.3;
 }
 
-/* Code block styling */
-pre,
-pre > code {
-  background-color: #2d2d2d !important;
+/* ===== Code Blocks ===== */
+
+pre, pre code {
+  background-color: #2e2e2e !important;
   color: #aad8ff !important;
   padding: 1em !important;
-  border-radius: 5px !important;
+  border-radius: 5px;
   overflow-x: auto;
   font-family: 'Fira Code', monospace !important;
-  font-size: 0.9em !important;
+  font-size: 0.9em;
+  line-height: 1.5;
 }
 
-/* Inline code styling */
 code {
   background-color: #3a3a3a !important;
   color: #aad8ff !important;
-  padding: 0.2em 0.4em !important;
-  border-radius: 3px !important;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
   font-family: 'Fira Code', monospace !important;
 }
 
-/* Rouge syntax highlighting override */
-/* Keywords */
-.k,
-.kd,
-.kn,
-.kb {
-  color: #ff7f50 !important; /* Coral orange */
-  font-weight: bold !important;
+/* ===== Rouge Syntax Highlighting Fixes ===== */
+
+/* Keywords like `return`, `def`, `if` */
+.k, .kd, .kn, .kp, .kr, .kt {
+  color: #ff7f50 !important;
+  font-weight: bold;
 }
 
-/* Functions */
-.nf {
-  color: #ffa07a !important; /* Light salmon */
-  font-weight: bold !important;
-}
-
-/* Built-in names */
-.nb {
-  color: #ff8c00 !important; /* Dark orange */
-  font-weight: bold !important;
-}
-
-/* Class names */
-.nc {
-  color: #87ceeb !important; /* Sky blue */
-  font-weight: bold !important;
-}
-
-/* Attributes */
-.na {
-  color: #ffd700 !important; /* Gold */
+/* Constants like `True`, `False`, `None` */
+.kc {
+  color: #d19a66 !important;
+  font-weight: bold;
 }
 
 /* Strings */
-.s,
-.s1,
-.s2,
-.sh,
-.si,
-.sx {
-  color: #ce9178 !important; /* Light brown */
-}
-
-/* Comments */
-.c,
-.c1,
-.cm {
-  color: #6a9955 !important; /* Soft green */
-  font-style: italic !important;
-}
-
-/* Operators */
-.o {
-  color: #d4d4d4 !important; /* Light grey */
-}
-
-/* Punctuation */
-.p {
-  color: #d4d4d4 !important;
-}
-
-/* Variables */
-.v {
-  color: #ff7f50 !important; /* Coral */
+.s, .s1, .s2 {
+  color: #ce9178 !important;
 }
 
 /* Numbers */
 .m {
-  color: #b5cea8 !important; /* Pale green */
+  color: #b5cea8 !important;
+}
+
+/* Function names */
+.nf {
+  color: #ffd700 !important;
+}
+
+/* Comments */
+.c, .c1, .cm {
+  color: #6a9955 !important;
+  font-style: italic;
+}
+
+/* Operators / punctuation */
+.o, .p {
+  color: #d4d4d4 !important;
 }
