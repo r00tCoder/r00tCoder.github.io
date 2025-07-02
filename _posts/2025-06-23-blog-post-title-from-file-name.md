@@ -255,15 +255,30 @@ First thing that came to my mind was to check current application code to look f
 
 ![obraz](https://github.com/user-attachments/assets/89959cb5-01e3-498d-91cf-47abed6ee072)
 
-`4d_09@fhgRTdws2`  
+```
+4d_09@fhgRTdws2
+```
+
 Unfortunately it is not reused, there is no second user.  
 
 There are also two new ports open 4566 and 38047, I discovered it with netstat -nvlp command.  
 
+![obraz](https://github.com/user-attachments/assets/a5292c47-3db9-46ba-bd56-a1d38f1c0563)  
 
+I'll leave them for now and proceed to look for cron jobs with pspy64.  
+```
+https://github.com/DominicBreuker/pspy/releases/tag/v1.2.1
+```
 
+![obraz](https://github.com/user-attachments/assets/98c6ec68-3da7-48c4-bd24-c1d9eac4f92c)
 
+We successfully found some cron jobs running:  
 
+![obraz](https://github.com/user-attachments/assets/dc86aee0-121a-4f70-882d-3afcff78dde3)
+
+The one that is intresting to us is:  
++  /bin/bash /usr/bin/backup.sh   
++  /usr/bin/tar -cvf /opt/backups/923048034.tar /var/www/app/   
 
 
 
