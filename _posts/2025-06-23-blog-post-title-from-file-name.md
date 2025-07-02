@@ -216,7 +216,8 @@ Press f12 and add a cookie named auth and paste JWT token as value.
 Now with cookie set we can access /order directory.  
 ![obraz](https://github.com/user-attachments/assets/b376f5cd-1831-4999-8c1e-f05aa3bfba8d)
 
-
+We can now try to exploit previously identified SSTI vulnerability.  
+Server-Side Template Injection (SSTI) is a type of security vulnerability that occurs when user input is improperly handled within a server-side template engine.  
 
 
 
