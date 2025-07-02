@@ -1,96 +1,76 @@
-/* === Global Dark Theme === */
-body {
-  background-color: #1f1f1f !important;
-  color: #f5f5f5 !important;
-  font-family: 'Fira Code', monospace;
+hr {
+  margin-top: 30px;
+  margin-bottom: 20px;
 }
 
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-  color: #ffffff !important;
+/* Post navigation links */
+.post_navi {
+  display: flex;
 }
+
+.post_navi-label {
+  font-size: 0.8em;
+  opacity: 0.5;
+}
+
+.post_navi .post_navi-item {
+  padding: 0 2.2em;
+  width: 50%;
+  position: relative;
+  color: inherit !important;
+}
+
+.post_navi .nav_prev {
+  text-align: left;
+}
+
+.post_navi .nav_next {
+  text-align: right;
+}
+
+.post_navi .nav_prev .post_navi-arrow {
+  left: 0;
+}
+
+.post_navi .nav_next .post_navi-arrow {
+  right: 0;
+}
+
+.post_navi .post_navi-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2.5em;
+  opacity: 0.3;
+}
+
+body {
+  background-color: #1f1f1f !important;
+  color: #f5f5f5 !important; /* light grey text for contrast */
+}
+
 h2 {
   color: red !important;
 }
 
-/* Links */
-a {
-  color: #58a6ff !important;
-}
 
-/* Horizontal Rule */
-hr {
-  margin-top: 30px;
-  margin-bottom: 20px;
-  border-color: #444;
-}
-
-/* === Code Blocks === */
-pre, pre > code {
-  background-color: #2e2e2e !important;
-  color: #aad8ff !important;
+/* Code block styling */
+pre, 
+pre > code {
+  background-color: #2d2d2d !important; /* Dark grey background */
+  color: #aad8ff !important;             /* Soft blue text color */
   padding: 1em !important;
-  border-radius: 6px;
+  border-radius: 5px !important;
   overflow-x: auto;
-  font-size: 0.9em;
-  font-family: 'Fira Code', monospace;
+  font-family: 'Fira Code', monospace, monospace !important; /* nice monospace font */
+  font-size: 0.9em !important;
 }
 
-/* Inline code */
+/* Inline code styling */
 code {
-  background-color: #3a3a3a !important;
+  background-color: #3a3a3a !important; /* slightly lighter dark grey */
   color: #aad8ff !important;
   padding: 0.2em 0.4em !important;
-  border-radius: 4px !important;
-  font-family: 'Fira Code', monospace;
-}
-
-/* === Rouge Syntax Highlighting Fixes === */
-
-/* Keywords like return, def, if */
-.highlight .k,
-.highlight .kd,
-.highlight .kn,
-.highlight .kp,
-.highlight .kr,
-.highlight .kt {
-  color: #ff7f50 !important;
-  font-weight: bold;
-}
-
-/* Constants like True, False, None */
-.highlight .kc {
-  color: #ffcc66 !important;
-  font-weight: bold;
-}
-
-/* Strings */
-.highlight .s,
-.highlight .s1,
-.highlight .s2 {
-  color: #ce9178 !important;
-}
-
-/* Numbers */
-.highlight .m {
-  color: #b5cea8 !important;
-}
-
-/* Function names */
-.highlight .nf {
-  color: #ffd700 !important;
-}
-
-/* Comments */
-.highlight .c,
-.highlight .c1,
-.highlight .cm {
-  color: #6a9955 !important;
-  font-style: italic;
-}
-
-/* Punctuation */
-.highlight .o,
-.highlight .p {
-  color: #d4d4d4 !important;
+  border-radius: 3px !important;
+  font-family: 'Fira Code', monospace, monospace !important;
 }
