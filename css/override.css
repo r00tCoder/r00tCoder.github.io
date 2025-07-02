@@ -53,16 +53,15 @@ h2 {
   color: red !important;
 }
 
-
 /* Code block styling */
 pre, 
 pre > code {
   background-color: #2d2d2d !important; /* Dark grey background */
-  color: #aad8ff !important;             /* Soft blue text color */
+  color: #aad8ff !important;             /* Soft blue text for normal text */
   padding: 1em !important;
   border-radius: 5px !important;
   overflow-x: auto;
-  font-family: 'Fira Code', monospace, monospace !important; /* nice monospace font */
+  font-family: 'Fira Code', monospace !important;
   font-size: 0.9em !important;
 }
 
@@ -72,5 +71,30 @@ code {
   color: #aad8ff !important;
   padding: 0.2em 0.4em !important;
   border-radius: 3px !important;
-  font-family: 'Fira Code', monospace, monospace !important;
+  font-family: 'Fira Code', monospace !important;
+}
+
+/* Override Rouge syntax highlighting for keywords and important tokens */
+.token.keyword,
+.token.function,
+.token.builtin,
+.token.constant,
+.token.selector,
+.token.variable {
+  color: #ff7f50 !important; /* Coral orange for visibility */
+  font-weight: bold !important;
+}
+
+.token.comment {
+  color: #6a9955 !important; /* soft green for comments */
+  font-style: italic !important;
+}
+
+.token.string {
+  color: #ce9178 !important; /* light brown for strings */
+}
+
+.token.operator,
+.token.punctuation {
+  color: #d4d4d4 !important; /* light grey for punctuation */
 }
