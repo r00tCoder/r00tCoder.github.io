@@ -178,6 +178,64 @@ http://cloud.epsilon.htb/2015-03-31/functions/costume_shop_v1/code
 ```
 ![obraz](https://github.com/user-attachments/assets/7d35087f-aa9c-4443-8d7a-a63f137f4803)
 
+Let's unzip it and view:  
+![obraz](https://github.com/user-attachments/assets/f4dfc0ca-8006-4a04-b8b2-b0d7d793e36e)
+
+
+![obraz](https://github.com/user-attachments/assets/d257cb64-fc8a-479e-834d-e1febcdbd16f)
+
+It exposed a secret:  
+```
+secret='RrXCv`mrNe!K!4+5`wYq'
+```
+
+It was mentioed before in website source code.  
+We can encode this secret as JWT token, and use it to authenticate to the website.  
+
+![obraz](https://github.com/user-attachments/assets/ae0642a6-86c0-4451-985b-80d6d4fc5441)
+
+Now we have cookie value but we don't know the cookie name.    
+To get cookie name we can go back to the website code:  
+```
+cat server.py
+
+[...]
+token=jwt.encode({"username":"admin"},secret,algorithm="HS256")
+   res.set_cookie("auth",token)
+[...]
+```
+Cookie is called auth, now go to website on port 5000.  
+Press f12 and add a cookie named auth and paste JWT token as value.  
+
+![obraz](https://github.com/user-attachments/assets/ae57a42b-6560-4b36-91c0-ddd7f8e3b407)
+
+
+
+## Port 5000 - Exploiting SSTI  
+
+Now with cookie set we can access /order directory.  
+![obraz](https://github.com/user-attachments/assets/b376f5cd-1831-4999-8c1e-f05aa3bfba8d)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
