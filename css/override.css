@@ -1,9 +1,19 @@
+/* General styling */
+body {
+  background-color: #1f1f1f !important;
+  color: #f5f5f5 !important;
+}
+
+h2 {
+  color: red !important;
+}
+
 hr {
   margin-top: 30px;
   margin-bottom: 20px;
 }
 
-/* Post navigation links */
+/* Post navigation */
 .post_navi {
   display: flex;
 }
@@ -44,15 +54,7 @@ hr {
   opacity: 0.3;
 }
 
-body {
-  background-color: #1f1f1f !important;
-  color: #f5f5f5 !important;
-}
-
-h2 {
-  color: red !important;
-}
-
+/* Code block styling */
 pre,
 pre > code {
   background-color: #2d2d2d !important;
@@ -64,6 +66,7 @@ pre > code {
   font-size: 0.9em !important;
 }
 
+/* Inline code styling */
 code {
   background-color: #3a3a3a !important;
   color: #aad8ff !important;
@@ -72,14 +75,73 @@ code {
   font-family: 'Fira Code', monospace !important;
 }
 
-/* Rouge syntax highlighting fixes */
-.k { color: #ff7f50 !important; font-weight: bold !important; } /* keyword */
-.nf { color: #ff7f50 !important; font-weight: bold !important; } /* function name */
-.nb { color: #ff7f50 !important; font-weight: bold !important; } /* built-in name */
-.nc { color: #ff7f50 !important; font-weight: bold !important; } /* class name */
-.na { color: #ff7f50 !important; font-weight: bold !important; } /* attribute name */
-.s1, .s2, .sh, .si, .sx { color: #ce9178 !important; } /* strings */
-.c1, .cm { color: #6a9955 !important; font-style: italic !important; } /* comments */
-.o { color: #d4d4d4 !important; } /* operators */
-.p { color: #d4d4d4 !important; } /* punctuation */
-.v { color: #ff7f50 !important; } /* variables */
+/* Rouge syntax highlighting override */
+/* Keywords */
+.k,
+.kd,
+.kn,
+.kb {
+  color: #ff7f50 !important; /* Coral orange */
+  font-weight: bold !important;
+}
+
+/* Functions */
+.nf {
+  color: #ffa07a !important; /* Light salmon */
+  font-weight: bold !important;
+}
+
+/* Built-in names */
+.nb {
+  color: #ff8c00 !important; /* Dark orange */
+  font-weight: bold !important;
+}
+
+/* Class names */
+.nc {
+  color: #87ceeb !important; /* Sky blue */
+  font-weight: bold !important;
+}
+
+/* Attributes */
+.na {
+  color: #ffd700 !important; /* Gold */
+}
+
+/* Strings */
+.s,
+.s1,
+.s2,
+.sh,
+.si,
+.sx {
+  color: #ce9178 !important; /* Light brown */
+}
+
+/* Comments */
+.c,
+.c1,
+.cm {
+  color: #6a9955 !important; /* Soft green */
+  font-style: italic !important;
+}
+
+/* Operators */
+.o {
+  color: #d4d4d4 !important; /* Light grey */
+}
+
+/* Punctuation */
+.p {
+  color: #d4d4d4 !important;
+}
+
+/* Variables */
+.v {
+  color: #ff7f50 !important; /* Coral */
+}
+
+/* Numbers */
+.m {
+  color: #b5cea8 !important; /* Pale green */
+}
