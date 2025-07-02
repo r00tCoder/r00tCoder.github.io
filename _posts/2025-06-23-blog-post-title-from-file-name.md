@@ -280,17 +280,45 @@ The one that is intresting to us is:
 +  /bin/bash /usr/bin/backup.sh   
 +  /usr/bin/tar -cvf /opt/backups/923048034.tar /var/www/app/   
 
+Let's take a look at this script: 
 
+![obraz](https://github.com/user-attachments/assets/43209ad7-c094-49d3-98ed-d88308fd107b)
 
+The second-to-last line of code contains a security risk.  
+It uses tar command with -h option, meaning it will follow symlinks.  
 
+We need to wait for checksum being created and then we can create a symlink on it to any file:  
 
+![obraz](https://github.com/user-attachments/assets/8771fc94-f683-4b70-bf0a-001710a1b32f)
 
+There is only 5 second window to overwrite checksum file.  
+Now it will get archived into a .tar file which we can view without extracting it:  
+```
+tar -xOf 518221472.tar opt/backups/checksum
+```
 
+![obraz](https://github.com/user-attachments/assets/2dde95b1-b0b9-4b31-a1f0-df47cf82c2c4)
 
+It works, now we will try to retrieve root's ssh key:  
+```
+ln -sf /root/.ssh/id_rsa /opt/backups/checksum
+```
 
+![obraz](https://github.com/user-attachments/assets/57c1c2f0-0bb6-4542-9c21-39a71b81fc1a)
 
+And now we can view it:  
 
+![obraz](https://github.com/user-attachments/assets/36cc3295-b775-42cd-83b0-48ab1f3dc8f1)
 
+With the key we can connect via ssh:  
+
+![obraz](https://github.com/user-attachments/assets/d7da68df-44a5-4a67-9343-d7fb80d06457)
+
+Lastly we will retrieve a flag:  
+
+![obraz](https://github.com/user-attachments/assets/f6b1b15a-3f05-47bb-a171-a7646d81389d)
+
+Thank you for reading!  
 
 
 
