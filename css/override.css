@@ -1,134 +1,96 @@
----
----
-
-@import "minima";
-
-/* ===== Custom Dark Theme ===== */
-
+/* === Global Dark Theme === */
 body {
   background-color: #1f1f1f !important;
   color: #f5f5f5 !important;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Fira Code', monospace;
 }
 
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
   color: #ffffff !important;
 }
-
 h2 {
   color: red !important;
 }
 
+/* Links */
 a {
   color: #58a6ff !important;
 }
 
+/* Horizontal Rule */
 hr {
   margin-top: 30px;
   margin-bottom: 20px;
   border-color: #444;
 }
 
-/* ===== Post Navigation Styling ===== */
-
-.post_navi {
-  display: flex;
-  margin-top: 2em;
-}
-
-.post_navi-label {
-  font-size: 0.8em;
-  opacity: 0.5;
-}
-
-.post_navi .post_navi-item {
-  padding: 0 2.2em;
-  width: 50%;
-  position: relative;
-  color: inherit !important;
-}
-
-.post_navi .nav_prev {
-  text-align: left;
-}
-
-.post_navi .nav_next {
-  text-align: right;
-}
-
-.post_navi .nav_prev .post_navi-arrow {
-  left: 0;
-}
-
-.post_navi .nav_next .post_navi-arrow {
-  right: 0;
-}
-
-.post_navi .post_navi-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 2.5em;
-  opacity: 0.3;
-}
-
-/* ===== Code Blocks ===== */
-
-pre, pre code {
+/* === Code Blocks === */
+pre, pre > code {
   background-color: #2e2e2e !important;
   color: #aad8ff !important;
   padding: 1em !important;
-  border-radius: 5px;
+  border-radius: 6px;
   overflow-x: auto;
-  font-family: 'Fira Code', monospace !important;
   font-size: 0.9em;
-  line-height: 1.5;
+  font-family: 'Fira Code', monospace;
 }
 
+/* Inline code */
 code {
   background-color: #3a3a3a !important;
   color: #aad8ff !important;
-  padding: 0.2em 0.4em;
-  border-radius: 3px;
-  font-family: 'Fira Code', monospace !important;
+  padding: 0.2em 0.4em !important;
+  border-radius: 4px !important;
+  font-family: 'Fira Code', monospace;
 }
 
-/* ===== Rouge Syntax Highlighting Fixes ===== */
+/* === Rouge Syntax Highlighting Fixes === */
 
-/* Keywords like `return`, `def`, `if` */
-.k, .kd, .kn, .kp, .kr, .kt {
+/* Keywords like return, def, if */
+.highlight .k,
+.highlight .kd,
+.highlight .kn,
+.highlight .kp,
+.highlight .kr,
+.highlight .kt {
   color: #ff7f50 !important;
   font-weight: bold;
 }
 
-/* Constants like `True`, `False`, `None` */
-.kc {
-  color: #d19a66 !important;
+/* Constants like True, False, None */
+.highlight .kc {
+  color: #ffcc66 !important;
   font-weight: bold;
 }
 
 /* Strings */
-.s, .s1, .s2 {
+.highlight .s,
+.highlight .s1,
+.highlight .s2 {
   color: #ce9178 !important;
 }
 
 /* Numbers */
-.m {
+.highlight .m {
   color: #b5cea8 !important;
 }
 
 /* Function names */
-.nf {
+.highlight .nf {
   color: #ffd700 !important;
 }
 
 /* Comments */
-.c, .c1, .cm {
+.highlight .c,
+.highlight .c1,
+.highlight .cm {
   color: #6a9955 !important;
   font-style: italic;
 }
 
-/* Operators / punctuation */
-.o, .p {
+/* Punctuation */
+.highlight .o,
+.highlight .p {
   color: #d4d4d4 !important;
 }
