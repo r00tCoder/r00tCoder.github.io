@@ -1,30 +1,23 @@
 title: "r00tCoder's CTF Notes"
 author: "Kacper Madej"
-description: "© 2025 Kacper Madej — Cybersecurity enthusiast | OSCP+ | CCNA | BTL1 | Sec+| Open to work" # This will show up in places like twitter, linkedin, etc, if you share your sites url as a post.
+description: "© 2025 Kacper Madej — Cybersecurity enthusiast | OSCP+ | CCNA | BTL1 | Sec+| Open to work"
 
-# Email / Social media user names used by the minima theme:
-# All of these are optional and can be removed or commented out
 email: "kacpermadej333@gmail.com"
 github_username: "r00tCoder"
 linkedin_username: "kacper-madej-b7b523319"
-#facebook_username: username
-#flickr_username: username
-#instagram_username: username
-#pinterest_username: username
-#youtube_username: username
-#googleplus_username: +username
 
-#########################################################################################
-######### Nothing below needs to be changed (unless you know what you're doing) #########
-#########################################################################################
-theme: "minima"
+theme: minima
 
 rss: rss
 
+# ✅ Enable syntax highlighting with Rouge
+highlighter: rouge
+markdown: kramdown
+
 kramdown:
-  syntax_highlighter_opts:
-    disable: true
-    
+  input: GFM
+  syntax_highlighter: rouge
+
 plugins:
   - jekyll-feed
   - jekyll-sitemap
