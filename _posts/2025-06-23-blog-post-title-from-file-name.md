@@ -15,7 +15,7 @@ Finally, a backup script was abused to escalate to root and capture the flag.
 ![obraz](https://github.com/user-attachments/assets/9be0b7ea-b767-4772-b2e2-3ad9771c9b31)  
 
 
- ## Port 80 - Website  
+## Port 80 - Website  
 
 ![obraz](https://github.com/user-attachments/assets/bb21866c-d4c4-4a48-a7bb-996c222d7453)  
 
@@ -218,15 +218,28 @@ Now with cookie set we can access /order directory.
 
 We can now try to exploit previously identified SSTI vulnerability.  
 Server-Side Template Injection (SSTI) is a type of security vulnerability that occurs when user input is improperly handled within a server-side template engine.  
+We can now catch a request with burp and then manipulate costume parameter which wouldn't be possible directly on the website.  
 
+![obraz](https://github.com/user-attachments/assets/5ef0c091-3cd8-4a5e-b11a-31e9de0178d9)
 
+Basic payload to test for SSTI is {{7*7}}, if it returns as 49 it means we have SSTI working.  
 
+![obraz](https://github.com/user-attachments/assets/65c3f784-ce29-4f95-af09-54c08a7e958a)  
 
+Now we can try to achieve code execution with this payload:  
+```
+{{ cycler.__init__.__globals__.os.popen('id').read() }}
+```
+It worked, let's now encode a reverse shell payload:   
+![obraz](https://github.com/user-attachments/assets/7392e19a-4b87-435d-b6a5-8c9b545de562)
 
+And now run place it into SSTI payload and start a listener.   
 
+![obraz](https://github.com/user-attachments/assets/fa20558b-3ef3-432e-94ea-ae6bf25aef42)
 
+We got a connection back!   
 
-
+![obraz](https://github.com/user-attachments/assets/f84d488a-6870-4af4-ac00-3f9f0fe55137)
 
 
 
