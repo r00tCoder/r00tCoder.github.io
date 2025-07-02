@@ -152,6 +152,9 @@ def order():
 It takes "costume" parameter as user input and passes it to render_template_string which is a dangerous function.  
 
 
+## AWS command line tool - exploitation  
+
+I will install awscli to talk with the server, then configure secrets that we previously found in .git directory:  
 
 
 
