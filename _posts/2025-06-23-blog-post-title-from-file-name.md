@@ -227,10 +227,11 @@ Basic payload to test for SSTI is {{7*7}}, if it returns as 49 it means we have 
 ![obraz](https://github.com/user-attachments/assets/65c3f784-ce29-4f95-af09-54c08a7e958a)  
 
 Now we can try to achieve code execution with this payload:  
-```
-{{ cycler.__init__.__globals__.os.popen('id').read() }}
-```
+
+{{ cycler.__init__.__globals__.os.popen('id').read() }}  
+
 It worked, let's now encode a reverse shell payload:   
+
 ![obraz](https://github.com/user-attachments/assets/7392e19a-4b87-435d-b6a5-8c9b545de562)
 
 And now run place it into SSTI payload and start a listener.   
