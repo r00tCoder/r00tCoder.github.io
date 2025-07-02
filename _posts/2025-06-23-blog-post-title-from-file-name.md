@@ -1,14 +1,18 @@
-## HTB Epsilon (Medium) - Writeup
+## HTB Epsilon (Medium) - Writeup  
+  
+Difficulty: Medium  
 
-Difficulty: Medium
-
-Olympus was a well-designed box involving DNS exploitation and Wi-Fi cracking, with containerization playing a key role throughout the journey.  
-Privilege escalation was achieved through a misconfiguration, making for a solid and enjoyable challenge.  
+AWS keys were found exposed in a git repository on the webserver.    
+Using those keys, the AWS command line was exploited to access cloud functions and retrieve a secret.   
+That secret was then used to exploit the site for code execution with SSTI and gain an initial shell.    
+Finally, a backup script was abused to escalate to root and capture the flag.   
 ---
 
 ## Nmap 
 
-#### The nmap scan revealed three open and one filtered port:
+#### The nmap scan revealed three open ports:
 
-![obraz](https://github.com/user-attachments/assets/981edf0e-18d3-4d26-9ee1-a08c7fdad02c)
+![obraz](https://github.com/user-attachments/assets/9be0b7ea-b767-4772-b2e2-3ad9771c9b31)
 
+
+ 
