@@ -50,7 +50,7 @@ It exposed AWS secret key:
 I will also add cloud.epsilon.htb to /etc/hosts.  
 Now I'll analyze source code and after that we can try to use aws key.  
 I'll paste the code here:  
-```
+```python
 #!/usr/bin/python3
 
 import jwt
@@ -119,7 +119,7 @@ app.run(debug='true')
 ```
 There are a few routes but every one of them calls verify_jwt() function.  
 This function look like this:  
-```
+```python
 def verify_jwt(token,key):
         try:
                 username=jwt.decode(token,key,algorithms=['HS256',])['username']
@@ -133,7 +133,7 @@ def verify_jwt(token,key):
 I tried logging in to the website on port 5000 with admin:admin, but it didn’t work.  
 The code must have changed since then.  
 Another thing that came from reading the code is the possibility of SSTI vulnerability in /order.  
-```
+```python
 @app.route('/order',methods=["GET","POST"])
 def order():
         if verify_jwt(request.cookies.get('auth'),secret):
@@ -196,7 +196,7 @@ We can encode this secret as JWT token, and use it to authenticate to the websit
 
 Now we have cookie value but we don't know the cookie name.    
 To get cookie name we can go back to the website code:  
-```
+```python
 cat server.py
 
 [...]
