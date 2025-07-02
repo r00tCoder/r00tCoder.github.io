@@ -228,7 +228,7 @@ Basic payload to test for SSTI is {{7*7}}, if it returns as 49 it means we have 
 
 Now we can try to achieve code execution with this payload:  
 
-{{ cycler.__init__.__globals__.os.popen('id').read() }}  
+`{{ cycler.__init__.__globals__.os.popen('id').read() }}`
 
 It worked, let's now encode a reverse shell payload:   
 
@@ -241,6 +241,68 @@ And now run place it into SSTI payload and start a listener.
 We got a connection back!   
 
 ![obraz](https://github.com/user-attachments/assets/f84d488a-6870-4af4-ac00-3f9f0fe55137)
+
+
+
+## Priv Esc  
+
+We can retrieve a flag.  
+
+![obraz](https://github.com/user-attachments/assets/bcac3d10-ad97-4567-a6f3-2d4dd13268da)
+
+
+First thing that came to my mind was to check current application code to look for credentials.  
+
+![obraz](https://github.com/user-attachments/assets/89959cb5-01e3-498d-91cf-47abed6ee072)
+
+`4d_09@fhgRTdws2`  
+Unfortunately it is not reused, there is no second user.  
+
+There are also two new ports open 4566 and 38047, I discovered it with netstat -nvlp command.  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
