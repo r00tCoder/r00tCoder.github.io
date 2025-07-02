@@ -46,18 +46,17 @@ hr {
 
 body {
   background-color: #1f1f1f !important;
-  color: #f5f5f5 !important; /* light grey text for contrast */
+  color: #f5f5f5 !important;
 }
 
 h2 {
   color: red !important;
 }
 
-/* Code block styling */
-pre, 
+pre,
 pre > code {
-  background-color: #2d2d2d !important; /* Dark grey background */
-  color: #aad8ff !important;             /* Soft blue text for normal text */
+  background-color: #2d2d2d !important;
+  color: #aad8ff !important;
   padding: 1em !important;
   border-radius: 5px !important;
   overflow-x: auto;
@@ -65,36 +64,22 @@ pre > code {
   font-size: 0.9em !important;
 }
 
-/* Inline code styling */
 code {
-  background-color: #3a3a3a !important; /* slightly lighter dark grey */
+  background-color: #3a3a3a !important;
   color: #aad8ff !important;
   padding: 0.2em 0.4em !important;
   border-radius: 3px !important;
   font-family: 'Fira Code', monospace !important;
 }
 
-/* Override Rouge syntax highlighting for keywords and important tokens */
-.token.keyword,
-.token.function,
-.token.builtin,
-.token.constant,
-.token.selector,
-.token.variable {
-  color: #ff7f50 !important; /* Coral orange for visibility */
-  font-weight: bold !important;
-}
-
-.token.comment {
-  color: #6a9955 !important; /* soft green for comments */
-  font-style: italic !important;
-}
-
-.token.string {
-  color: #ce9178 !important; /* light brown for strings */
-}
-
-.token.operator,
-.token.punctuation {
-  color: #d4d4d4 !important; /* light grey for punctuation */
-}
+/* Rouge syntax highlighting fixes */
+.k { color: #ff7f50 !important; font-weight: bold !important; } /* keyword */
+.nf { color: #ff7f50 !important; font-weight: bold !important; } /* function name */
+.nb { color: #ff7f50 !important; font-weight: bold !important; } /* built-in name */
+.nc { color: #ff7f50 !important; font-weight: bold !important; } /* class name */
+.na { color: #ff7f50 !important; font-weight: bold !important; } /* attribute name */
+.s1, .s2, .sh, .si, .sx { color: #ce9178 !important; } /* strings */
+.c1, .cm { color: #6a9955 !important; font-style: italic !important; } /* comments */
+.o { color: #d4d4d4 !important; } /* operators */
+.p { color: #d4d4d4 !important; } /* punctuation */
+.v { color: #ff7f50 !important; } /* variables */
