@@ -324,4 +324,6 @@ Add-ADGroupMember -Identity 'Domain Admins' -Members 'maria'
 For it to take changes we have to exit evil-winrm and connect again.  
 Lastly we will retrieve the root flag.  
 
-![obraz](https://github.com/user-attachments/assets/cbd67214-a04f-4e14-9504-803c9a450b0d)
+![obraz](https://github.com/user-attachments/assets/cbd67214-a04f-4e14-9504-803c9a450b0d)  
+
+Thank you for reading!!
