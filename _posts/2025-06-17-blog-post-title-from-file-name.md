@@ -1,4 +1,4 @@
-## HTB Sandworm (Medium) - Writeup  
+## HTB Sandworm (Medium) - Writeup
 
 Difficulty: Medium  
 
