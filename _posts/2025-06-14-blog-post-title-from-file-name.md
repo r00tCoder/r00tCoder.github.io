@@ -142,10 +142,16 @@ After that we want to sign a message and export it's signature:
 gpg --local-user 24A027F729D76AEE8DE74EEEFD61AF656FB0700A --clearsign text
 cat text.asc
 ```
+![obraz](https://github.com/user-attachments/assets/2089bbb7-eeea-4f14-b06a-149c58f0cc21)
 
-![obraz](https://github.com/user-attachments/assets/d6b40bb1-d1d8-4f11-9f3b-0e5069ffb491)  
+Now paste both of then into the site and click "Verify Signature".  
 
+![obraz](https://github.com/user-attachments/assets/a8b189e1-ae41-4f32-8373-38bbb72e3e07)
 
+It performed multiplication which means that the templating engine is vulnerable to SSTI.  
+
+Before we test for code execution we can dump the config:  
+```
 
 
 
