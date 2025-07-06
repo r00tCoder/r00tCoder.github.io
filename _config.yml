@@ -7,7 +7,7 @@ github_username: "r00tCoder"
 linkedin_username: "kacper-madej-b7b523319"
 
 theme: minima
-
+future: true
 rss: rss
 
 # ✅ Enable syntax highlighting with Rouge
