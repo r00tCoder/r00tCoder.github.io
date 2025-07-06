@@ -1,3 +1,11 @@
+---
+layout: post
+title: "HTB Sandworm (Medium) - Writeup"
+date: 2025-07-02
+tags: [HTB, CTF, privilege-escalation, GPG, Firejail]
+---
+
+
 ## HTB Sandworm (Medium) - Writeup
 
 Difficulty: Medium  
