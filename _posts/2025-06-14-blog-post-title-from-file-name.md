@@ -1,4 +1,4 @@
-## HTB Sandworm (Medium) - Writeup  
+![obraz](https://github.com/user-attachments/assets/b0fdbed6-0f3b-4732-b26a-a9488a08a05a)## HTB Sandworm (Medium) - Writeup  
 
 Difficulty: Medium  
 
@@ -67,21 +67,83 @@ We can now paste this message and click on "Decrypt".
 
 It just decrypts but there is nothing unusual.  
 
+The second section of the site allows us to provide our public key, and it responds with a message encrypted using that key.  
+For it to work we need to generate a key:  
+```
+gpg --full-key-gen
+```
+It will prompt with some questions, go with any values you like doesn't matter.  
+
+![obraz](https://github.com/user-attachments/assets/ed288c89-4d7d-4e8d-bfd2-26be4f7b36dd)
+
+Site allows us to paste the key, for that we need to print it with coresponding key ID:  
+```
+gpg --armor --export B8A1EE1855AA25C45247A84A3B30A676B4804748 
+```
+![obraz](https://github.com/user-attachments/assets/e2645220-4377-4390-89a5-e1d66039a48b)
 
 
+Now if we paste this key they will use it to decrypt some message:  
+
+![obraz](https://github.com/user-attachments/assets/7da727ae-2e57-4ad6-b6a7-dc2a1aca876d)  
+
+We can copy it and decrypt because we own the key:  
+```
+gpg --decrypt msg.txt
+```
+
+![obraz](https://github.com/user-attachments/assets/fa9eb5f2-1da1-454f-be7f-4e0dfab3f960)
+
+Nothing unusual so far.  
+
+Third and last section allows to verify a signature.  
+With pgp we can sign a message, let's do it:  
+
+![obraz](https://github.com/user-attachments/assets/7ffdb0b3-5c0f-4146-b474-73a584a6e64f)
 
 
+Now signature will be save into test.txt.asc:  
+
+![obraz](https://github.com/user-attachments/assets/e56b426e-16c3-448e-8d07-55c22587a8a6)
+
+If we paste the key and the signature into the site and click on verify signature we get:  
+
+![obraz](https://github.com/user-attachments/assets/52aea4bb-433b-4a03-85c4-ec91254417f6)
+
+And now is is something very intresting.  
+It uses most likely some templating engine.  
+There is possibility that it will contain SSTI vulnerability.  
+
+Now we want to look for a parameter that is being generated and that we control.  
+In this case template contains key name that we control when generating a key:  
+
+![obraz](https://github.com/user-attachments/assets/2738ee0f-ecf9-47f2-8bf9-de1e5ded5a49)
 
 
+## SSTI - exploitation  
 
+First we need to verify if it's vulnerable with a poc payload.  
+Previously we generated a key with full generation command, but there is an option to generate it faster:  
+```
+gpg --quick-generate-key "{{7*7}}" default default never
+```
+![obraz](https://github.com/user-attachments/assets/317c2949-cc4f-4f23-a373-7c49353dde0e)  
 
+Now we need to create a message and export the key:  
+```
+echo "malicious" > text
+gpg --armor --export 24A027F729D76AEE8DE74EEEFD61AF656FB0700A
+```
 
+![obraz](https://github.com/user-attachments/assets/6a7df3d1-fed6-4d61-b1b5-fadf944cd8de)  
 
+After that we want to sign a message and export it's signature:  
+```
+gpg --local-user 24A027F729D76AEE8DE74EEEFD61AF656FB0700A --clearsign text
+cat text.asc
+```
 
-
-
-
-
+![obraz](https://github.com/user-attachments/assets/d6b40bb1-d1d8-4f11-9f3b-0e5069ffb491)  
 
 
 
