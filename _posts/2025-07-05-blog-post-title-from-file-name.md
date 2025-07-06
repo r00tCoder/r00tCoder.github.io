@@ -20,3 +20,4 @@ Finally, we exploit a known Firejail vulnerability (CVE-2022-31214) to escalate 
 ## Nmap 
 
 #### The nmap scan revealed three open ports:  
+asd
