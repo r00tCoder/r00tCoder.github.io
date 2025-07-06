@@ -1,4 +1,4 @@
-![obraz](https://github.com/user-attachments/assets/b0fdbed6-0f3b-4732-b26a-a9488a08a05a)## HTB Sandworm (Medium) - Writeup  
+## HTB Sandworm (Medium) - Writeup  
 
 Difficulty: Medium  
 
