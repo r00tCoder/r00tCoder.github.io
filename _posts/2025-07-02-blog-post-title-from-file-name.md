@@ -125,7 +125,7 @@ In this case template contains key name that we control when generating a key:
 First we need to verify if it's vulnerable with a poc payload.  
 Previously we generated a key with full generation command, but there is an option to generate it faster:  
 ```
-gpg --quick-generate-key "{{7*7}}" default default never
+{% raw %} gpg --quick-generate-key "{{7*7}}" default default never {% endraw %}
 ```
 ![obraz](https://github.com/user-attachments/assets/317c2949-cc4f-4f23-a373-7c49353dde0e)  
 
