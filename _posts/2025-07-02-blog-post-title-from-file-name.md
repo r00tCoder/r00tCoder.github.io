@@ -18,7 +18,7 @@ Finally, we exploit a known Firejail vulnerability (CVE-2022-31214) to escalate 
 
 ## Port 80 - Website  
 
-This website just redirects to httpsL//ssa.htb  
+This website just redirects to https://ssa.htb  
 We'll add it to /etc/hosts and move to 443  
 
 
