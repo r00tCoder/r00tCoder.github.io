@@ -190,7 +190,7 @@ def export_note_remote():
                 try:
                     r = pyrequest.get(url,allow_redirects=True)
                     rand_int = random.randint(1,10000)  {% raw %}
-                    command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}" {% endraw %}
+                    command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}"
                     subprocess.run(command, shell=True, executable="/bin/bash")
 
                         if os.path.isfile(attachment_dir + f'{str(rand_int)}.pdf'):  {% endraw %}
