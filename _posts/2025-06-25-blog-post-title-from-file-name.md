@@ -189,11 +189,11 @@ def export_note_remote():
             if (status is True) and (error is None):
                 try:
                     r = pyrequest.get(url,allow_redirects=True)
-                    rand_int = random.randint(1,10000)
-       {% raw %}             command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}" {% endraw %}
+                    rand_int = random.randint(1,10000)  {% raw %}
+                    command = f"node misc/md-to-pdf.js  $'{r.text.strip()}' {rand_int}" {% endraw %}
                     subprocess.run(command, shell=True, executable="/bin/bash")
 
-          {% raw %}     if os.path.isfile(attachment_dir + f'{str(rand_int)}.pdf'):  {% endraw %}
+                        if os.path.isfile(attachment_dir + f'{str(rand_int)}.pdf'):  {% endraw %}
 
                         return send_file(attachment_dir + f'{str(rand_int)}.pdf', as_attachment=True)
 
@@ -201,14 +201,14 @@ def export_note_remote():
                         return render_template('export_note.html', error="Error occured while exporting the !")
 
                 except Exception as e:
-                    return render_template('export_note.html', error="Error occured!")
+                        return render_template('export_note.html', error="Error occured!")
 
 
-            else:
-{% raw %}           return render_template('export_note.html', error=f"Error occured while exporting ! ({error})")  {% endraw %}
+            else: {% raw %}
+                        return render_template('export_note.html', error=f"Error occured while exporting ! ({error})") 
             
         except Exception as e:
-{% raw %}           return render_template('export_note.html', error=f"Error occured while exporting ! ({e})") {% endraw %}
+                        return render_template('export_note.html', error=f"Error occured while exporting ! ({e})") {% endraw %}
 
     else:
         abort(403)
