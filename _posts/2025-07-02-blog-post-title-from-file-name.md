@@ -237,10 +237,10 @@ https://github.com/DominicBreuker/pspy/releases
 
 It revealed some crons:  
 +  /bin/bash /root/Cleanup/clean_c.sh  
-+  /bin/sh -c cd /opt/tipnet && /bin/echo "e" | /bin/sudo -u atlas /usr/bin/cargo run --offline
++ {% raw %}  /bin/sh -c cd /opt/tipnet && /bin/echo "e" | /bin/sudo -u atlas /usr/bin/cargo run --offline {% endraw %}
 
 There is a tipnet binary written in rust, I'll paste it's source code here:  
-```rust
+```
 extern crate logger;
 use sha2::{Digest, Sha256};
 use chrono::prelude::*;
@@ -462,7 +462,7 @@ Luckily we have write privilege over it:
 ![obraz](https://github.com/user-attachments/assets/98107a81-7c6e-4212-8fcd-3fe00c1a6f5f)
 
 We can simply add command at the bottom and one import at the top:  
-```rust
+```
 extern crate chrono;
 
 use std::fs::OpenOptions;
