@@ -152,9 +152,7 @@ It performed multiplication which means that the templating engine is vulnerable
 
 Before we test for code execution we can dump the config:  
 ```
-{% raw %}
-gpg --quick-generate-key "{{ config }}" default default never
-{% endraw %}
+{% raw %} gpg --quick-generate-key "{{ config }}" default default never {% endraw %}
 ```
 
 
