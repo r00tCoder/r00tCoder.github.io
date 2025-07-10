@@ -21,7 +21,7 @@ Finally escalated to root by abusing a race condition in a misconfigured enableS
 On port 80 we have default apache page.  
 
 
-<img width="1280" height="760" alt="obraz" src="https://github.com/user-attachments/assets/8a192149-d721-4a97-b9ae-64376aa47671" />
+<img width="1500" height="1200" alt="obraz" src="https://github.com/user-attachments/assets/8a192149-d721-4a97-b9ae-64376aa47671" />
 
 
 <img width="1281" height="765" alt="obraz" src="https://github.com/user-attachments/assets/fa982757-a908-4bba-94ef-2e1f90300274" />
