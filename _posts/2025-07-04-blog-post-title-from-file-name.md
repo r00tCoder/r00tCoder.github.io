@@ -44,17 +44,76 @@ If we had relied solely on passive detection, many plugins would have been misse
 <img width="954" height="356" alt="obraz" src="https://github.com/user-attachments/assets/93001081-e523-4421-a43f-4e9d65e3d087" />
 
 It has found akismet but besides that nothing of interest.  
+Now I'll add tenet.htb to /etc/hosts  
+
+<img width="1273" height="762" alt="obraz" src="https://github.com/user-attachments/assets/2c4665bc-a354-47b8-82ec-20a96a7c2c32" />
+
+While exploring the site, I came across a comment:  
+
+<img width="1269" height="757" alt="obraz" src="https://github.com/user-attachments/assets/ff0e22af-9ec5-413f-8ce1-93457c24c061" />
+
+Let's look for this "sator" file.  
+On tenet.htb it didn't work:  
+```
+http://tenet.htb/sator.php
+```
+
+But on apache default page it worked:  
+```
+http://10.10.10.223/sator.php
+```
+
+<img width="1273" height="386" alt="obraz" src="https://github.com/user-attachments/assets/0eb5c304-ee2a-4919-84dd-b6dd00d77250" />
+
+They also mentioned sator backup file, let's try to retrieve it:  
+```
+http://10.10.10.223/sator.php.bak
+```
+
+We can download it and look at the source code:  
+
+<img width="941" height="484" alt="obraz" src="https://github.com/user-attachments/assets/d05c332c-a01c-4226-adaf-ded2c34edcc7" />
+
+```php
+<?php
+
+class DatabaseExport
+{
+        public $user_file = 'users.txt';
+        public $data = '';
+
+        public function update_db()
+        {
+                echo '[+] Grabbing users from text file <br>';
+                $this-> data = 'Success';
+        }
 
 
+        public function __destruct()
+        {
+                file_put_contents(__DIR__ . '/' . $this ->user_file, $this->data);
+                echo '[] Database updated <br>';
+        //      echo 'Gotta get this working properly...';
+        }
+}
+
+$input = $_GET['arepo'] ?? '';
+$databaseupdate = unserialize($input);
+
+$app = new DatabaseExport;
+$app -> update_db();
 
 
+?>
+```
 
+First thing that immediately stands out is dangerous usage of unserialize function.  
+This script passes user input to unserialize() which can be abused in deserialization attack.  
 
-
-
-
-
-
+The script takes user input from the arepo GET parameter and passes it directly to the unserialize() function.  
+This allows us to create a PHP object from user input.  
+When the script finishes, PHP automatically destroys all objects, which triggers the __destruct() method of our crafted object.  
+It means that __desctruct() will run against our object.  
 
 
 
