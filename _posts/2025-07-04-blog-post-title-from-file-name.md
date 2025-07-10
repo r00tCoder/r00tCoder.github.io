@@ -116,6 +116,12 @@ When the script finishes, PHP automatically destroys all objects, which triggers
 It means that __desctruct() will run against our object.  
 
 
+## PHP Deserialization attack
+
+POC payload would look like this:  
+```
+{% raw %} O:14:"DatabaseExport":2:{s:9:"user_file";s:8:"test.txt";s:4:"data";s:11:"Hello World";} {% endraw %}
+```
 
 
 
