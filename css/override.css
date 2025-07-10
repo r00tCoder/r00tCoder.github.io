@@ -116,3 +116,10 @@ h2 {
 
 .highlight .ge {
   font-style: italic !important
+
+
+img {
+  max-width: none !important;
+  width: auto !important;
+  height: auto !important;
+}
