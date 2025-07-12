@@ -92,7 +92,7 @@ The admin’s password hash starts with 0e, which PHP interprets as scientific n
 
 In the code, authentication likely uses a loose comparison like:  
 ```
-if ($password_hash == $stored_hash) { ... }
+{% raw %}  if ($password_hash == $stored_hash) { ... } {% endraw %}
 ```
 Because the hash starts with 0e, PHP treats it as 0. If we supply a password that when hashed also evaluates to 0 under loose comparison the comparison becomes:  
 ```
@@ -228,7 +228,8 @@ open OUT, "|pnmtopng" or die "Can't pipe pnmtopng: $!\n";
 
 printf OUT "P6%d %d\n255\n", $w, $h;
 
-while ((read STDIN, $raw, 2) and $pixels--) {
+{% raw %}
+while ((read STDIN, $raw, 2) and $pixels--) {  {% endraw %}
    $short = unpack('S', $raw);
    print OUT pack("C3",
       ($short & 0xf800) >> 8,
